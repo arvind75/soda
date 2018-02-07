@@ -1,6 +1,5 @@
 from rpython.rlib.runicode import str_decode_utf_8
 from rply import ParserGenerator
-from soda.stringfmt import
 from soda.lexer import lexer
 from soda import ast
 
