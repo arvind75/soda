@@ -10,7 +10,7 @@ def main(argv):
     isdump = False
     norun = False
     sourcefound = False
-    data = ""
+    data = []
     for arg in argv:
         if arg.startswith("-"):
             if arg == "--dump":
@@ -21,14 +21,15 @@ def main(argv):
             if not sourcefound:
                 try:
                     f = open_file_as_stream(arg)
-                    data = f.readall()
+                    data.append(f.readall())
                     f.close()
                     sourcefound = True
-                except Exception as e:
+                except OSError as e:
                     print("Fatal error: %s" % e)
                     return 1
         
-    if not data == "":
+    if not data == []:
+        data = "".join(data)
         bc = compile_ast(parser.parse(lexer.lex(data)))
         if isdump:
             print(bc.dump())

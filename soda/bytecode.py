@@ -5,7 +5,7 @@ MUL = 4
 DIV = 5
 MOD = 6
 POW = 7
-PRINT = 8
+PRINTLN = 99
 
 BINOP_CODE = {
     "+": ADD,
@@ -26,7 +26,7 @@ NAMES = {
     DIV: "       DIV",
     MOD: "       MOD",
     POW: "       POW",
-    PRINT: "     PRINT",
+    PRINTLN: "   PRINTLN",
 }
 
 class Compiler(object):
@@ -41,6 +41,9 @@ class Compiler(object):
     def emit(self, code, arg=0):
         self.stack.append(code)
         self.stack.append(arg)
+
+    def build_dependencies(self, package):
+        print(package)
 
     def create_bytecode(self):
         return Bytecode(self.stack, self.constants[:])

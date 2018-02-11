@@ -8,7 +8,7 @@ driver = jit.JitDriver(greens=["pc", "code", "bc"],
 
 class Frame(object):  
     def __init__(self, bc):
-        self.valuestack = [None] * 4
+        self.valuestack = [None] * len(bc.code)
         self.valuestack_pos = 0
 
     def push(self, value):
@@ -74,14 +74,13 @@ def run(frame, bc):
             result = right.pow(left)
             frame.push(result)
             
-        elif c == bytecode.PRINT:
+        elif c == bytecode.PRINTLN:
             output = frame.pop().str()
             print(output)
-            
         else:
             assert False
 
 def interpret(bc):
     frame = Frame(bc)
     run(frame, bc)
-    return frame
+    return 0
