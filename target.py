@@ -2,8 +2,8 @@ from rpython.rlib.streamio import open_file_as_stream
 from rpython.jit.codewriter.policy import JitPolicy
 from soda.interpreter import interpret
 from soda.parser import parser
-from soda.lexer import lexer
 from soda.bytecode import compile_ast
+from soda.fetch import fetcher
 import sys
 
 def main(argv):
@@ -24,13 +24,16 @@ def main(argv):
                     data.append(f.readall())
                     f.close()
                     sourcefound = True
+                    fetcher.add_package(arg.rstrip(".na"))
                 except OSError as e:
                     print("Fatal error: %s" % e)
                     return 1
         
     if not data == []:
         data = "".join(data)
-        bc = compile_ast(parser.parse(lexer.lex(data)))
+        strippedtokens = fetcher.find()
+        bc = compile_ast(parser.parse(strippedtokens))
+        
         if isdump:
             print(bc.dump())
         if not norun:

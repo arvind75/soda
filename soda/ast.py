@@ -1,44 +1,10 @@
 from rply.token import BaseBox
 from soda import bytecode
 from soda.objects import SodaNumber, SodaString
+from soda.fetch import fetcher
 
 class Node(BaseBox):
     pass
-
-class FetchBlock(Node):
-    def __init__(self, block, statement):
-        self.block = block
-        self.statement = statement
-
-    def compile(self, compiler):
-        self.block.compile(compiler)
-        # maneuver to fetch.py here
-        self.statement.compile(compiler)
-
-class FetchOnly(Node):
-    def __init__(self, block):
-        self.block = block
-
-    def compile(self, compiler):
-        self.block.compile(compiler)
-         # maneuver to fetch.py here
-
-class PackagePair(Node):
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def compile(self, compiler):
-        self.left.compile(compiler)
-        self.right.compile(compiler)
-
-class PackageString(Node):
-    def __init__(self, value):
-        self.value = value
-
-    def compile(self, compiler):
-        # maneuver to fetch.py here
-        print("found a string")
 
 class StatementPair(Node):
     def __init__(self, left, right):
