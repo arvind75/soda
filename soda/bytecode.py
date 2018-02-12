@@ -42,9 +42,6 @@ class Compiler(object):
         self.stack.append(code)
         self.stack.append(arg)
 
-    def build_dependencies(self, package):
-        print(package)
-
     def create_bytecode(self):
         return Bytecode(self.stack, self.constants[:])
 

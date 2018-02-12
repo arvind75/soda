@@ -15,7 +15,6 @@ pg = ParserGenerator(
         ")",
         "NUMBER",
         "STRING",
-        "FETCH",
         "PRINTLN",
     ],
     precedence=[
@@ -28,22 +27,6 @@ pg = ParserGenerator(
 
 @pg.production("main : statement")
 def main_statement(s):
-    return s[0]
-
-@pg.production("main : FETCH package")
-def fetch_only(s):
-    return ast.FetchOnly(s[1])
-
-@pg.production("main : FETCH package statement")
-def main_fetch(s):
-    return ast.FetchStatement(s[1], s[2])
-
-@pg.production("package : package package")
-def package_package(s):
-    return ast.PackagePair(s[0], s[1])
-
-@pg.production("package : packagestring")
-def package_packagestring(s):
     return s[0]
 
 @pg.production("statement : statement statement")
