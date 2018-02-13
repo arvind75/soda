@@ -10,17 +10,16 @@ class Fetcher(object):
         self.packages.append(package)
 
     def fetch_tokens(self, data):
-        tokenstream = lexer.lex(data)
         tokenlist = []
         fetch_found = False
-        for token in tokenstream:
+        for token in lexer.lex(data):
             tokenlist.append(token)
-
+            
         for i in range(0, len(tokenlist)):
             if not fetch_found:
                 if tokenlist[i].gettokentype() == "FETCH":
                     if not i == 0:
-                        raise Exception("fetch error: fetch must precede main program")
+                        raise SyntaxError("fetch must precede main program")
                     else:
                         fetch_found = True
                 else:
@@ -28,6 +27,8 @@ class Fetcher(object):
             else:
                 if tokenlist[i].gettokentype() == "STRING":
                     p = tokenlist[i].getstr().strip("\"")
+                    if p == self.packages[0]:
+                        raise SyntaxError("cannot fetch root package %s" % p)
                     if p not in self.packages:
                         self.packages.append(p)
                 else:
@@ -46,7 +47,7 @@ class Fetcher(object):
                 tokens = self.fetch_tokens("".join(data))
                 tokenlist.append(tokens)
             except OSError:
-                raise Exception("fetch error: package %s not found" % package)
+                raise OSError("package %s not found" % package)
 
             for tokens in tokenlist:
                 for token in tokens:

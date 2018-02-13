@@ -32,8 +32,8 @@ def main(argv):
     if not data == []:
         data = "".join(data)
         strippedtokens = fetcher.find()
+        tokenlist = []
         bc = compile_ast(parser.parse(strippedtokens))
-        
         if isdump:
             print(bc.dump())
         if not norun:
