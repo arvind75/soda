@@ -1,4 +1,5 @@
 from soda import bytecode
+from soda.errors import sodaError
 from rpython.rlib import jit
 
 driver = jit.JitDriver(greens=["pc", "code", "bc"],
@@ -78,7 +79,7 @@ def run(frame, bc):
             output = frame.pop().str()
             print(output)
         else:
-            assert False
+            sodaError("unrecognized bytecode %s" % c)
 
 def interpret(bc):
     frame = Frame(bc)

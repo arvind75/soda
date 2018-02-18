@@ -1,5 +1,7 @@
 from rpython.rlib.streamio import open_file_as_stream
+from rply.errors import LexingError
 from soda.lexer import lexer
+from soda.errors import sodaError
 import os
 
 class Fetcher(object):
@@ -12,14 +14,19 @@ class Fetcher(object):
     def fetch_tokens(self, data):
         tokenlist = []
         fetch_found = False
-        for token in lexer.lex(data):
-            tokenlist.append(token)
+        try:
+            for token in lexer.lex(data):
+                tokenlist.append(token)
+        except LexingError as LE:
+            print("errored out, man!")
+            os._exit(1)
             
         for i in range(0, len(tokenlist)):
             if not fetch_found:
                 if tokenlist[i].gettokentype() == "FETCH":
                     if not i == 0:
-                        raise SyntaxError("fetch must precede main program")
+                        sodaError("fetch statement must precede main program")
+                        pass
                     else:
                         fetch_found = True
                 else:
@@ -28,7 +35,7 @@ class Fetcher(object):
                 if tokenlist[i].gettokentype() == "STRING":
                     p = tokenlist[i].getstr().strip("\"")
                     if p == self.packages[0]:
-                        raise SyntaxError("cannot fetch root package %s" % p)
+                        sodaError("cannot fetch root package \"%s\"" % p)
                     if p not in self.packages:
                         self.packages.append(p)
                 else:
@@ -47,7 +54,7 @@ class Fetcher(object):
                 tokens = self.fetch_tokens("".join(data))
                 tokenlist.append(tokens)
             except OSError:
-                raise OSError("package %s not found" % package)
+                sodaError("package \"%s\" not found" % package)
 
             for tokens in tokenlist:
                 for token in tokens:
