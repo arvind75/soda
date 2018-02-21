@@ -1,5 +1,4 @@
 from rpython.rlib.streamio import open_file_as_stream
-from rply.errors import LexingError
 from soda.lexer import lexer
 from soda.errors import sodaError
 import os
@@ -11,15 +10,12 @@ class Fetcher(object):
     def add_package(self, package):
         self.packages.append(package)
 
-    def fetch_tokens(self, data):
+    def fetch_tokens(self, data, package):
         tokenlist = []
         fetch_found = False
-        try:
-            for token in lexer.lex(data):
-                tokenlist.append(token)
-        except LexingError as LE:
-            print("errored out, man!")
-            os._exit(1)
+        
+        for token in lexer.lex(data, package):
+            tokenlist.append(token)
             
         for i in range(0, len(tokenlist)):
             if not fetch_found:
@@ -33,7 +29,7 @@ class Fetcher(object):
                     yield(tokenlist[i])
             else:
                 if tokenlist[i].gettokentype() == "STRING":
-                    p = tokenlist[i].getstr().strip("\"")
+                    p = tokenlist[i].getstr()
                     if p == self.packages[0]:
                         sodaError("cannot fetch root package \"%s\"" % p)
                     if p not in self.packages:
@@ -51,7 +47,7 @@ class Fetcher(object):
                 file = open_file_as_stream(filepath)
                 data.append(file.readall())
                 file.close()
-                tokens = self.fetch_tokens("".join(data))
+                tokens = self.fetch_tokens("".join(data), package)
                 tokenlist.append(tokens)
             except OSError:
                 sodaError("package \"%s\" not found" % package)

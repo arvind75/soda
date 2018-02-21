@@ -66,8 +66,6 @@ def expression_stringliteral(s):
 @pg.production("stringliteral : STRING")
 def stringliteral_string(s):
     string = s[0].getstr()
-    string = string[:-1]
-    string = string[1:]
     string, trash = str_decode_utf_8(string, len(string), "strict", True)
     return ast.String(string)
 
