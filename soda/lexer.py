@@ -1,20 +1,24 @@
 from rply.token import Token, BaseBox, SourcePosition
+import os
 
 whitespace = " \n\r\v\t"
-escapes = "\n\r\v\t"
+newlines = "\n\r\v"
 symbols = "()+-*/%^\"#"
 alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-numeric = "0123456789"
+numeric = "123456789"
+numeric2 = "0123456789.eE-+"
 reserved = ["Println", "fetch"]
 
 class Lexer(BaseBox):
-    def __init__(self, idx=-1, lineno=1, colno=1):
+    def __init__(self, packages=[], idx=-1, lineno=1, colno=1):
+        self.packages = packages
         self.idx = idx
         self.lineno = lineno
         self.colno = colno
 
-    def lex(self, source, package): # function should emit a package token
-                                    # to help parser manage state
+    def lex(self, source):
+        self.lineno = 1
+        self.colno = 1
         i = 0
         value = []
         while i < len(source):
@@ -34,7 +38,6 @@ class Lexer(BaseBox):
                 continue
             elif source[i] in symbols:
                 if source[i] == "(":
-                    self.idx += 1
                     self.colno += 1
                     yield Token(name="(", value="(",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -43,7 +46,7 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == ")":
-                    self.idx += 1
+                    
                     self.colno += 1
                     yield Token(name=")", value=")",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -52,7 +55,7 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "+":
-                    self.idx += 1
+                    
                     self.colno += 1
                     yield Token(name="+", value="+",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -72,7 +75,7 @@ class Lexer(BaseBox):
                                 source[j]
                             except IndexError:
                                 break
-                        self.idx += 1
+                        
                         i = j
                         yield Token(name="NUMBER", value="".join(value),
                                     source_pos=SourcePosition(idx=self.idx,
@@ -80,7 +83,7 @@ class Lexer(BaseBox):
                                                               colno=self.colno))
                         value = []
                         continue
-                    self.idx += 1
+                    
                     self.colno += 1
                     yield Token(name="-", value="-",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -89,9 +92,7 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "*":
-
-
-                    self.idx += 1
+                    
                     self.colno += 1
                     yield Token(name="*", value="*",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -100,9 +101,7 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "/":
-
-
-                    self.idx += 1
+                    
                     self.colno += 1
                     yield Token(name="/", value="/",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -111,9 +110,7 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "%":
-
-
-                    self.idx += 1
+                    
                     self.colno += 1
                     yield Token(name="%", value="%",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -122,9 +119,7 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "^":
-
-
-                    self.idx += 1
+                    
                     self.colno += 1
                     yield Token(name="^", value="^",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -143,9 +138,9 @@ class Lexer(BaseBox):
                         try:
                             source[j + 1]
                         except IndexError:
-                            break
-                        if source[j] in escapes:
-                            break
+                            break # BAD STRING
+                        if source[j] in newlines:
+                            break # BAD STRING - NEWLINE
                         elif source[j] == "\\":
                             if source[j + 1] == "\\":
                                 value.append("\\")
@@ -183,7 +178,7 @@ class Lexer(BaseBox):
                             value.append(source[j])
                             self.colno += 1
                             j += 1
-                    self.idx += 1
+                    
                     self.colno += 1
                     yield Token(name="STRING", value="".join(value),
                                 source_pos=SourcePosition(idx=self.idx,
@@ -204,7 +199,7 @@ class Lexer(BaseBox):
                     continue
             elif source[i] in numeric:
                 j = i
-                while source[j] in numeric:
+                while source[j] in numeric2:
                     value.append(source[j])
                     self.colno += 1
                     j += 1
@@ -212,7 +207,7 @@ class Lexer(BaseBox):
                         source[j]
                     except IndexError:
                         break
-                self.idx += 1
+                
                 i = j
                 yield Token(name="NUMBER", value="".join(value),
                             source_pos=SourcePosition(idx=self.idx,
@@ -233,17 +228,16 @@ class Lexer(BaseBox):
                 iden = "".join(value)
                 if iden in reserved:
                     if iden == "Println":
-                        self.idx += 1
+                        
                         yield Token(name="PRINTLN", value=iden,
                                     source_pos=SourcePosition(idx=self.idx,
                                                               lineno=self.lineno,
                                                               colno=self.colno))
                     elif iden == "fetch":
-                        self.idx += 1
                         yield Token(name="FETCH", value=iden,
                                     source_pos=SourcePosition(idx=self.idx,
                                                               lineno=self.lineno,
-                                                              colno=self.colno))
+                                                              colno=self.colno))       
                 else:
                     pass # IDENTIFIER TOK HERE
                 value = []

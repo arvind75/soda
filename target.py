@@ -1,6 +1,7 @@
 from rpython.rlib.streamio import open_file_as_stream
 from rpython.jit.codewriter.policy import JitPolicy
 from soda.interpreter import interpret
+from soda.lexer import lexer
 from soda.parser import parser
 from soda.bytecode import compile_ast
 from soda.fetch import fetcher
@@ -10,7 +11,6 @@ def main(argv):
     isdump = False
     norun = False
     sourcefound = False
-    data = []
     for arg in argv:
         if arg.startswith("-"):
             if arg == "--dump":
@@ -19,26 +19,15 @@ def main(argv):
                 norun = True
         elif arg.endswith(".na"):
             if not sourcefound:
-                try:
-                    f = open_file_as_stream(arg)
-                    data.append(f.readall())
-                    f.close()
-                    sourcefound = True
-                    fetcher.add_package(arg.rstrip(".na"))
-                except OSError as e:
-                    print("Fatal error: %s" % e)
-                    return 1
+                sourcefound = True
+                fetcher.packages.append(arg.rstrip(".na"))
         
-    if not data == []:
-        data = "".join(data)
-        strippedtokens = fetcher.find()
-        tokenlist = []
-        bc = compile_ast(parser.parse(strippedtokens))
+    if sourcefound:
+        bc = compile_ast(parser.parse(fetcher.gettokens()))
         if isdump:
             print(bc.dump())
         if not norun:
             interpret(bc)
-        
     return 0
 
 def jitpolicy(driver):
