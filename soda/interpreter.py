@@ -79,7 +79,7 @@ def run(frame, bc):
             output = frame.pop().str()
             print(output)
         else:
-            sodaError("unrecognized bytecode %s" % c)
+            sodaError("test", "-1", "-1", "unrecognized bytecode %s" % c)
 
 def interpret(bc):
     frame = Frame(bc)

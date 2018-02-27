@@ -6,19 +6,19 @@ newlines = "\n\r\v"
 symbols = "()+-*/%^\"#"
 alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 numeric = "123456789"
-numeric2 = "0123456789.eE-+"
 reserved = ["Println", "fetch"]
 
 class Lexer(BaseBox):
-    def __init__(self, packages=[], idx=-1, lineno=1, colno=1):
-        self.packages = packages
-        self.idx = idx
-        self.lineno = lineno
-        self.colno = colno
-
-    def lex(self, source):
+    def __init__(self):
+        self.packages = []
+        self.idx = 0
         self.lineno = 1
         self.colno = 1
+
+    def lex(self, source, idx):
+        self.lineno = 1
+        self.colno = 1
+        self.idx = idx
         i = 0
         value = []
         while i < len(source):
@@ -132,15 +132,36 @@ class Lexer(BaseBox):
                     try:
                         source[j]
                     except IndexError:
-                        break # EMIT BAD STRING TOKEN HERE
+                        msg = "string not terminated"
+                        yield Token(name="ERROR",
+                                    value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
                     self.colno += 1
                     while not source[j] == "\"":
                         try:
                             source[j + 1]
                         except IndexError:
-                            break # BAD STRING
+                            msg = "string not terminated"
+                            yield Token(name="ERROR",
+                                        value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
                         if source[j] in newlines:
-                            break # BAD STRING - NEWLINE
+                            msg = "newline in string"
+                            yield Token(name="ERROR",
+                                        value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
                         elif source[j] == "\\":
                             if source[j + 1] == "\\":
                                 value.append("\\")
@@ -173,7 +194,14 @@ class Lexer(BaseBox):
                                 j += 2
                                 continue
                             else:
-                                break # EMIT BAD ESCAPE TOKEN
+                                msg = "unknown escape sequence \\%s" % source[j + 1]
+                                yield Token(name="ERROR",
+                                            value=msg,
+                                            source_pos=SourcePosition(
+                                                idx=self.idx,
+                                                lineno=self.lineno,
+                                                colno=self.colno))
+                                break
                         else:
                             value.append(source[j])
                             self.colno += 1
@@ -199,7 +227,7 @@ class Lexer(BaseBox):
                     continue
             elif source[i] in numeric:
                 j = i
-                while source[j] in numeric2:
+                while source[j] in numeric:
                     value.append(source[j])
                     self.colno += 1
                     j += 1
@@ -243,6 +271,13 @@ class Lexer(BaseBox):
                 value = []
                 i = j       
             else:
-                i += 1   # UNRECOGNIZED TOK HERE
+                msg = "unrecognized token %s" % source[i]
+                yield Token(name="ERROR",
+                            value=msg,
+                            source_pos=SourcePosition(
+                                idx=self.idx,
+                                lineno=self.lineno,
+                                colno=self.colno))
+                break
                 
 lexer = Lexer()

@@ -20,7 +20,8 @@ def main(argv):
         elif arg.endswith(".na"):
             if not sourcefound:
                 sourcefound = True
-                fetcher.packages.append(arg.rstrip(".na"))
+                root = arg.rstrip(".na")
+                fetcher.packages.append(root)
         
     if sourcefound:
         bc = compile_ast(parser.parse(fetcher.gettokens()))

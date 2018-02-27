@@ -1,6 +1,7 @@
 from rpython.rlib.runicode import str_decode_utf_8
 from rply import ParserGenerator
 from soda.errors import sodaError
+from soda.fetch import fetcher
 from soda import ast
 
 pg = ParserGenerator(
@@ -16,6 +17,7 @@ pg = ParserGenerator(
         "NUMBER",
         "STRING",
         "PRINTLN",
+        "ERROR"
     ],
     precedence=[
         ("left", ["+", "-"]),
@@ -64,15 +66,17 @@ def stringliteral_string(s):
     string, trash = str_decode_utf_8(string, len(string), "strict", True)
     return ast.String(string)
 
-currentdir = ""
-
 @pg.error
 def error_handler(token):
+    package = fetcher.packages[token.getsourcepos().idx]
+    line = str(token.getsourcepos().lineno)
+    col =  str(token.getsourcepos().colno)
     if token.value == "$end":
-        sodaError("unexpected end-of-file error")
+        sodaError(package, line, col, "EOF error")
+    elif token.name == "ERROR":
+        sodaError(package, line, col, token.value)
     else:
-        position = token.getsourcepos().lineno
-        lexeme = token.value
-        sodaError("in %s unexpected %s at line %s" % (currentdir, lexeme, position))
+        msg = "unexpected %s" % token.value
+        sodaError(package, line, col, msg)
         
 parser = pg.build()
