@@ -5,7 +5,7 @@ whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
 symbols = "()+-*/%^\"#"
 alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-numeric = "123456789"
+numeric = "0123456789"
 reserved = ["Println", "fetch"]
 
 class Lexer(BaseBox):
@@ -38,38 +38,37 @@ class Lexer(BaseBox):
                 continue
             elif source[i] in symbols:
                 if source[i] == "(":
-                    self.colno += 1
                     yield Token(name="(", value="(",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
+                    self.colno += 1
                     i += 1
                     continue
-                elif source[i] == ")":
-                    
-                    self.colno += 1
+                elif source[i] == ")":                    
                     yield Token(name=")", value=")",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
+                    self.colno += 1
                     i += 1
                     continue
                 elif source[i] == "+":
-                    
-                    self.colno += 1
                     yield Token(name="+", value="+",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
+                    self.colno += 1
                     i += 1
                     continue
                 elif source[i] == "-":
                     if source[i + 1] in numeric:
+                        k = 0
                         value.append("-")
                         j = i + 1
                         while source[j] in numeric:
                             value.append(source[j])
-                            self.colno += 1
+                            k += 1
                             j += 1
                             try:
                                 source[j]
@@ -81,53 +80,51 @@ class Lexer(BaseBox):
                                     source_pos=SourcePosition(idx=self.idx,
                                                               lineno=self.lineno,
                                                               colno=self.colno))
+                        self.colno += k
                         value = []
                         continue
                     
-                    self.colno += 1
                     yield Token(name="-", value="-",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
+                    self.colno += 1
                     i += 1
                     continue
-                elif source[i] == "*":
-                    
-                    self.colno += 1
+                elif source[i] == "*": 
                     yield Token(name="*", value="*",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
+                    self.colno += 1
                     i += 1
                     continue
                 elif source[i] == "/":
-                    
-                    self.colno += 1
                     yield Token(name="/", value="/",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
+                    self.colno += 1
                     i += 1
                     continue
                 elif source[i] == "%":
-                    
-                    self.colno += 1
                     yield Token(name="%", value="%",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
+                    self.colno += 1
                     i += 1
                     continue
                 elif source[i] == "^":
-                    
-                    self.colno += 1
                     yield Token(name="^", value="^",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
+                    self.colno += 1
                     i += 1
                     continue
                 elif source[i] == "\"":
+                    k = 0
                     j = i + 1
                     try:
                         source[j]
@@ -140,7 +137,6 @@ class Lexer(BaseBox):
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
-                    self.colno += 1
                     while not source[j] == "\"":
                         try:
                             source[j + 1]
@@ -165,33 +161,33 @@ class Lexer(BaseBox):
                         elif source[j] == "\\":
                             if source[j + 1] == "\\":
                                 value.append("\\")
-                                self.colno += 2
                                 j += 2
+                                k += 2
                                 continue
                             elif source[j + 1] == "n":
                                 value.append("\n")
-                                self.colno += 2
                                 j += 2
+                                K += 2
                                 continue
                             elif source[j + 1] == "t":
                                 value.append("\t")
-                                self.colno += 2
                                 j += 2
+                                k += 2
                                 continue
                             elif source[j + 1] == "r":
                                 value.append("\r")
-                                self.colno += 2
                                 j += 2
+                                k += 2
                                 continue
                             elif source[j + 1] == "v":
                                 value.append("\v")
-                                self.colno += 2
                                 j += 2
+                                k += 2
                                 continue
                             elif source[j + 1] == "\"":
                                 value.append("\"")
-                                self.colno += 2
                                 j += 2
+                                k += 2
                                 continue
                             else:
                                 msg = "unknown escape sequence \\%s" % source[j + 1]
@@ -204,16 +200,15 @@ class Lexer(BaseBox):
                                 break
                         else:
                             value.append(source[j])
-                            self.colno += 1
                             j += 1
-                    
-                    self.colno += 1
+                            k += 1
                     yield Token(name="STRING", value="".join(value),
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
                     value = []
                     i = j + 1
+                    self.colno += k
                     continue
                 elif source[i] == "#":
                     j = i
@@ -227,10 +222,11 @@ class Lexer(BaseBox):
                     continue
             elif source[i] in numeric:
                 j = i
+                k = 0
                 while source[j] in numeric:
                     value.append(source[j])
-                    self.colno += 1
                     j += 1
+                    k += 1
                     try:
                         source[j]
                     except IndexError:
@@ -241,14 +237,16 @@ class Lexer(BaseBox):
                             source_pos=SourcePosition(idx=self.idx,
                                                       lineno=self.lineno,
                                                       colno=self.colno))
+                self.colno += k
                 value = []
                 continue
             elif source[i] in alpha:
                 j = i
+                k = 0
                 while not source[j] in whitespace:
                     value.append(source[j])
-                    self.colno += 1
                     j += 1
+                    k += 1
                     try:
                         source[j]
                     except IndexError:
@@ -269,7 +267,8 @@ class Lexer(BaseBox):
                 else:
                     pass # IDENTIFIER TOK HERE
                 value = []
-                i = j       
+                i = j
+                self.colno += k
             else:
                 msg = "unrecognized token %s" % source[i]
                 yield Token(name="ERROR",

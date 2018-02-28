@@ -1,4 +1,5 @@
 from rpython.rlib.runicode import str_decode_utf_8
+from rpython.rlib.rbigint import rbigint
 from rply import ParserGenerator
 from soda.errors import sodaError
 from soda.fetch import fetcher
@@ -54,7 +55,8 @@ def expression_paren(s):
 
 @pg.production("expression : NUMBER")
 def expression_number(s):
-    return ast.Number(float(s[0].getstr()))
+    a = rbigint()
+    return ast.Number(a.fromstr(s[0].getstr()))
 
 @pg.production("expression : stringliteral")
 def expression_stringliteral(s):

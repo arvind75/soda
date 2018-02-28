@@ -1,6 +1,6 @@
 from rply.token import BaseBox
+from rpython.rlib.rbigint import rbigint
 from rpython.rlib.rstring import UnicodeBuilder
-from math import fmod, pow
 
 class SodaObject(BaseBox):
     pass
@@ -15,35 +15,33 @@ class SodaString(SodaObject):
 
 class SodaNumber(SodaObject):
     def __init__(self, value):
-        assert isinstance(value, float)
+        assert isinstance(value, rbigint)
         self.value = value
 
     def add(self, other):
         assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value + other.value)
+        return SodaNumber(self.value.add(other.value))
     
     def sub(self, other):
         assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value - other.value)
+        return SodaNumber(self.value.sub(other.value))
 
     def mul(self, other):
         assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value * other.value)
+        return SodaNumber(self.value.mul(other.value))
 
     def div(self, other):
         assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value / other.value)
+        return SodaNumber(self.value.floordiv(other.value))
 
     def mod(self, other):
         assert isinstance(other, SodaNumber)
-        return SodaNumber(fmod(self.value, other.value))
+        return SodaNumber(self.value.mod(other.value))
 
     def pow(self, other):
         assert isinstance(other, SodaNumber)
-        return SodaNumber(pow(self.value, other.value))
+        return SodaNumber(self.value.pow(other.value))
     
     def str(self):
-        s = "%f" % self.value
-        if "." in s:
-            s = s.rstrip("0").rstrip(".")
+        s = self.value.str()
         return unicode(s).encode("utf-8")
