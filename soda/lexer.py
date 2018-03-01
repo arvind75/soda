@@ -56,6 +56,28 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "+":
+                    try:
+                        if not (source[i + 1] in whitespace and source[i - 1]
+                           in whitespace):
+                            msg = (
+                                "operator and its operands must " +
+                                "be separated by whitespace")
+                            yield Token(name="ERROR", value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
+                    except IndexError:
+                        msg = (
+                            "operator and its operands must " +
+                            "be separated by whitespace")
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
                     yield Token(name="+", value="+",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -85,6 +107,28 @@ class Lexer(BaseBox):
                         self.colno += k
                         value = []
                         continue
+                    try:
+                        if not (source[i + 1] in whitespace and source[i - 1]
+                           in whitespace):
+                            msg = (
+                                "operator and its operands must " +
+                                "be separated by whitespace")
+                            yield Token(name="ERROR", value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
+                    except IndexError:
+                        msg = (
+                            "operator and its operands must " +
+                            "be separated by whitespace")
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
                     yield Token(name="-", value="-",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -93,6 +137,28 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "*":
+                    try:
+                        if not (source[i + 1] in whitespace and source[i - 1]
+                           in whitespace):
+                            msg = (
+                                "operator and its operands must " +
+                                "be separated by whitespace")
+                            yield Token(name="ERROR", value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
+                    except IndexError:
+                        msg = (
+                            "operator and its operands must " +
+                            "be separated by whitespace")
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
                     yield Token(name="*", value="*",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -101,6 +167,28 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "/":
+                    try:
+                        if not (source[i + 1] in whitespace and source[i - 1]
+                           in whitespace):
+                            msg = (
+                                "operator and its operands must " +
+                                "be separated by whitespace")
+                            yield Token(name="ERROR", value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
+                    except IndexError:
+                        msg = (
+                            "operator and its operands must " +
+                            "be separated by whitespace")
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
                     yield Token(name="/", value="/",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -109,6 +197,28 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "%":
+                    try:
+                        if not (source[i + 1] in whitespace and source[i - 1]
+                           in whitespace):
+                            msg = (
+                                "operator and its operands must " +
+                                "be separated by whitespace")
+                            yield Token(name="ERROR", value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
+                    except IndexError:
+                        msg = (
+                            "operator and its operands must " +
+                            "be separated by whitespace")
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
                     yield Token(name="%", value="%",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -117,6 +227,28 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "^":
+                    try:
+                        if not (source[i + 1] in whitespace and source[i - 1]
+                           in whitespace):
+                            msg = (
+                                "operator and its operands must " +
+                                "be separated by whitespace")
+                            yield Token(name="ERROR", value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
+                    except IndexError:
+                        msg = (
+                            "operator and its operands must " +
+                            "be separated by whitespace")
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
                     yield Token(name="^", value="^",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -281,6 +413,11 @@ class Lexer(BaseBox):
                                 lineno=self.lineno,
                                 colno=self.colno))
                 break
+        yield Token(name="$end", value="$end",
+                    source_pos=SourcePosition(
+                        idx=self.idx,
+                        lineno=self.lineno,
+                        colno=self.colno))
 
 
 lexer = Lexer()
