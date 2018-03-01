@@ -1,5 +1,5 @@
 from rply.token import Token, BaseBox, SourcePosition
-import os
+from soda.errors import sodaError
 
 whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
@@ -7,6 +7,7 @@ symbols = "()+-*/%^\"#"
 alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 numeric = "0123456789"
 reserved = ["Println", "fetch"]
+
 
 class Lexer(BaseBox):
     def __init__(self):
@@ -22,6 +23,7 @@ class Lexer(BaseBox):
         i = 0
         value = []
         while i < len(source):
+            k = 0
             if source[i] == " " or source[i] == "\t":
                 self.colno += 1
                 i += 1
@@ -45,7 +47,7 @@ class Lexer(BaseBox):
                     self.colno += 1
                     i += 1
                     continue
-                elif source[i] == ")":                    
+                elif source[i] == ")":
                     yield Token(name=")", value=")",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -74,16 +76,15 @@ class Lexer(BaseBox):
                                 source[j]
                             except IndexError:
                                 break
-                        
                         i = j
                         yield Token(name="NUMBER", value="".join(value),
-                                    source_pos=SourcePosition(idx=self.idx,
-                                                              lineno=self.lineno,
-                                                              colno=self.colno))
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
                         self.colno += k
                         value = []
                         continue
-                    
                     yield Token(name="-", value="-",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -91,7 +92,7 @@ class Lexer(BaseBox):
                     self.colno += 1
                     i += 1
                     continue
-                elif source[i] == "*": 
+                elif source[i] == "*":
                     yield Token(name="*", value="*",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -167,7 +168,7 @@ class Lexer(BaseBox):
                             elif source[j + 1] == "n":
                                 value.append("\n")
                                 j += 2
-                                K += 2
+                                k += 2
                                 continue
                             elif source[j + 1] == "t":
                                 value.append("\t")
@@ -190,7 +191,8 @@ class Lexer(BaseBox):
                                 k += 2
                                 continue
                             else:
-                                msg = "unknown escape sequence \\%s" % source[j + 1]
+                                msg = ("unknown escape sequence \\%s"
+                                       % source[j + 1])
                                 yield Token(name="ERROR",
                                             value=msg,
                                             source_pos=SourcePosition(
@@ -231,7 +233,6 @@ class Lexer(BaseBox):
                         source[j]
                     except IndexError:
                         break
-                
                 i = j
                 yield Token(name="NUMBER", value="".join(value),
                             source_pos=SourcePosition(idx=self.idx,
@@ -254,18 +255,20 @@ class Lexer(BaseBox):
                 iden = "".join(value)
                 if iden in reserved:
                     if iden == "Println":
-                        
                         yield Token(name="PRINTLN", value=iden,
-                                    source_pos=SourcePosition(idx=self.idx,
-                                                              lineno=self.lineno,
-                                                              colno=self.colno))
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
                     elif iden == "fetch":
                         yield Token(name="FETCH", value=iden,
-                                    source_pos=SourcePosition(idx=self.idx,
-                                                              lineno=self.lineno,
-                                                              colno=self.colno))       
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
                 else:
-                    pass # IDENTIFIER TOK HERE
+                    # IDEN TOKEN HERE
+                    sodaError("test", "-1", "-1", "iden not recognized")
                 value = []
                 i = j
                 self.colno += k
@@ -278,5 +281,6 @@ class Lexer(BaseBox):
                                 lineno=self.lineno,
                                 colno=self.colno))
                 break
-                
+
+
 lexer = Lexer()

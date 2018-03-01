@@ -1,10 +1,11 @@
 from rply.token import BaseBox
 from soda import bytecode
 from soda.objects import SodaNumber, SodaString
-from soda.fetch import fetcher
+
 
 class Node(BaseBox):
     pass
+
 
 class StatementPair(Node):
     def __init__(self, left, right):
@@ -15,12 +16,14 @@ class StatementPair(Node):
         self.left.compile(compiler)
         self.right.compile(compiler)
 
+
 class Statement(Node):
     def __init__(self, expr):
         self.expr = expr
 
     def compile(self, compiler):
         self.expr.compile(compiler)
+
 
 class String(Node):
     def __init__(self, value):
@@ -30,6 +33,7 @@ class String(Node):
         ss = SodaString(self.value)
         compiler.emit(bytecode.LOAD_CONST, compiler.register_constant(ss))
 
+
 class Number(Node):
     def __init__(self, value):
         self.value = value
@@ -37,7 +41,8 @@ class Number(Node):
     def compile(self, compiler):
         sn = SodaNumber(self.value)
         compiler.emit(bytecode.LOAD_CONST, compiler.register_constant(sn))
-        
+
+
 class BinOp(Node):
     def __init__(self, operator, left, right):
         self.left = left
@@ -48,6 +53,7 @@ class BinOp(Node):
         self.right.compile(compiler)
         self.left.compile(compiler)
         compiler.emit(bytecode.BINOP_CODE[self.operator])
+
 
 class PrintlnStatement(Node):
     def __init__(self, expr):

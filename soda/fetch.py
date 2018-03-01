@@ -1,7 +1,7 @@
 from rpython.rlib.streamio import open_file_as_stream
 from soda.lexer import lexer
 from soda.errors import sodaError
-import os
+
 
 class Fetcher(object):
     def __init__(self):
@@ -27,8 +27,9 @@ class Fetcher(object):
                               str(errtok.getsourcepos().colno),
                               "package \"%s\" not found" % package)
                 except AttributeError:
+                    # TODO: better error here
                     sodaError(package, "0", "0",
-                              "package \"%s\" not found" % package) #TODO better err here
+                              "package \"%s\" not found" % package)
             i = 0
             tokenlist = []
             if not self.data == "":
@@ -36,9 +37,12 @@ class Fetcher(object):
                     if not fetch_found:
                         if token.name == "FETCH":
                             if not i == 0:
-                                sodaError(package, str(token.getsourcepos().lineno),
-                                          str(token.getsourcepos().colno),
-                                          "fetch statement must precede main program")
+                                sodaError(
+                                    package,
+                                    str(token.getsourcepos().lineno),
+                                    str(token.getsourcepos().colno),
+                                    "fetch statement must precede main program"
+                                )
                             else:
                                 i += 1
                                 fetch_found = True
@@ -51,17 +55,19 @@ class Fetcher(object):
                                 self.packages.append(token.value)
                                 self.tokentopackage[token.value] = token
                             elif token.value == self.packages[0]:
-                                sodaError(package, str(token.getsourcepos().lineno),
-                                          str(token.getsourcepos().colno),
-                                          "cannot import root package \"%s\"" % token.value)
+                                sodaError(
+                                    package,
+                                    str(token.getsourcepos().lineno),
+                                    str(token.getsourcepos().colno),
+                                    "cannot import root package \"%s\""
+                                    % token.value
+                                )
                         else:
                             tokenlist.append(token)
                             fetch_found = False
             idx += 1
             self.data = ""
             self.tokgeneratorlist.append(tokenlist)
-
-            
 
     def gettokens(self):
         self.fetch()
@@ -71,5 +77,6 @@ class Fetcher(object):
             for token in generators:
                 yield token
             j += 1
-    
+
+
 fetcher = Fetcher()

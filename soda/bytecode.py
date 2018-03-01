@@ -29,6 +29,7 @@ NAMES = {
     PRINTLN: "   PRINTLN",
 }
 
+
 class Compiler(object):
     def __init__(self):
         self.stack = []
@@ -45,7 +46,8 @@ class Compiler(object):
     def create_bytecode(self):
         return Bytecode(self.stack, self.constants[:])
 
-class Bytecode(object):   
+
+class Bytecode(object):
     def __init__(self, code, constants):
         self.code = code
         self.constants = constants
@@ -57,6 +59,7 @@ class Bytecode(object):
             argument = str(self.code[i + 1])
             formatted.append("%s %s\n" % (opcode, argument))
         return "".join(formatted)
+
 
 def compile_ast(ast_node):
     compiler = Compiler()
