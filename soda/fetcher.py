@@ -6,15 +6,23 @@ from soda.errors import sodaError
 class Fetcher(object):
     def __init__(self):
         self.data = ""
+        self.recentpath = ""
         self.tokentopackage = {}
         self.packages = []
         self.tokgeneratorlist = []
+
+    def addpackage(self, filepath):
+        pathlist = filepath.split("/")
+        package = pathlist.pop()
+        if not pathlist == []:
+            self.recentpath += "/".join(pathlist) + "/"
+        self.packages.append(package)
 
     def fetch(self):
         idx = 0
         for package in self.packages:
             fetch_found = False
-            filepath = package + ".na"
+            filepath = self.recentpath + package + ".na"
             try:
                 sourcefile = open_file_as_stream(filepath)
                 self.data = sourcefile.readall()
@@ -52,7 +60,7 @@ class Fetcher(object):
                     else:
                         if token.name == "STRING":
                             if token.value not in self.packages:
-                                self.packages.append(token.value)
+                                self.addpackage(token.value)
                                 self.tokentopackage[token.value] = token
                             elif token.value == self.packages[0]:
                                 sodaError(

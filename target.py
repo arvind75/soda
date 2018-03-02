@@ -3,6 +3,7 @@ from soda.interpreter import interpret
 from soda.parser import parser
 from soda.bytecode import compile_ast
 from soda.fetcher import fetcher
+import os
 import sys
 
 
@@ -20,7 +21,8 @@ def main(argv):
             if not sourcefound:
                 sourcefound = True
                 root = arg.rstrip(".na")
-                fetcher.packages.append(root)
+                root = os.getcwd() + "/" + root
+                fetcher.addpackage(root)
     if sourcefound:
         bc = compile_ast(parser.parse(fetcher.gettokens()))
         if isdump:

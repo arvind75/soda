@@ -415,11 +415,6 @@ class Lexer(BaseBox):
                                 lineno=self.lineno,
                                 colno=self.colno))
                 break
-        yield Token(name="$end", value="$end",
-                    source_pos=SourcePosition(
-                        idx=self.idx,
-                        lineno=self.lineno,
-                        colno=self.colno))
 
 
 lexer = Lexer()
