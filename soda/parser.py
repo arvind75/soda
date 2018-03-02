@@ -17,7 +17,7 @@ pg = ParserGenerator(
         ")",
         "NUMBER",
         "STRING",
-        "PRINTLN",
+        "PUT",
         "ERROR"
     ],
     precedence=[
@@ -39,9 +39,9 @@ def statement_statement(s):
     return ast.StatementPair(s[0], s[1])
 
 
-@pg.production("statement : PRINTLN expression")
+@pg.production("statement : PUT expression")
 def println_expression(s):
-    return ast.PrintlnStatement(s[1])
+    return ast.PutStatement(s[1])
 
 
 @pg.production("expression : expression  +  expression")

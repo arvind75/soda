@@ -55,10 +55,10 @@ class BinOp(Node):
         compiler.emit(bytecode.BINOP_CODE[self.operator])
 
 
-class PrintlnStatement(Node):
+class PutStatement(Node):
     def __init__(self, expr):
         self.expr = expr
 
     def compile(self, compiler):
         self.expr.compile(compiler)
-        compiler.emit(bytecode.PRINTLN)
+        compiler.emit(bytecode.PUT)

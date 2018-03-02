@@ -5,7 +5,7 @@ MUL = 4
 DIV = 5
 MOD = 6
 POW = 7
-PRINTLN = 99
+PUT = 8
 
 BINOP_CODE = {
     "+": ADD,
@@ -26,7 +26,7 @@ NAMES = {
     DIV: "       DIV",
     MOD: "       MOD",
     POW: "       POW",
-    PRINTLN: "   PRINTLN",
+    PUT: "       PUT",
 }
 
 
