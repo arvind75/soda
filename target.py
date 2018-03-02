@@ -2,7 +2,7 @@ from rpython.jit.codewriter.policy import JitPolicy
 from soda.interpreter import interpret
 from soda.parser import parser
 from soda.bytecode import compile_ast
-from soda.fetch import fetcher
+from soda.fetcher import fetcher
 import sys
 
 

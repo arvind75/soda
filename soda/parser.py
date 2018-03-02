@@ -2,7 +2,7 @@ from rpython.rlib.runicode import str_decode_utf_8
 from rpython.rlib.rbigint import rbigint
 from rply import ParserGenerator
 from soda.errors import sodaError
-from soda.fetch import fetcher
+from soda.fetcher import fetcher
 from soda import ast
 
 pg = ParserGenerator(
