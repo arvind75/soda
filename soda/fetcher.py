@@ -7,7 +7,7 @@ class Fetcher(object):
     def __init__(self):
         self.idx = 0
         self.data = ""
-        self.recentpath = ""
+        self.pathtopackage = {}
         self.tokentopackage = {}
         self.packages = []
         self.tokgeneratorlist = []
@@ -16,13 +16,13 @@ class Fetcher(object):
         pathlist = filepath.split("/")
         package = pathlist.pop()
         if not pathlist == []:
-            self.recentpath += "/".join(pathlist) + "/"
+            self.pathtopackage[package] = "/".join(pathlist) + "/"
         self.packages.append(package)
 
     def fetch(self):
         for package in self.packages:
             fetch_found = False
-            filepath = self.recentpath + package + ".na"
+            filepath = self.pathtopackage[package] + package + ".na"
             try:
                 sourcefile = open_file_as_stream(filepath)
                 self.data = sourcefile.readall()
@@ -56,8 +56,10 @@ class Fetcher(object):
                         if token.name == "STRING":
                             pathlist = token.value.split("/")
                             pname = pathlist.pop()
+                            fullpath = self.pathtopackage[
+                                package] + token.value
                             if pname not in self.packages:
-                                self.addpackage(token.value)
+                                self.addpackage(fullpath)
                                 self.tokentopackage[pname] = token
                             elif pname == self.packages[0]:
                                 sodaError(
