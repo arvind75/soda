@@ -15,6 +15,7 @@ pg = ParserGenerator(
         "^",
         "(",
         ")",
+        ";",
         "NUMBER",
         "STRING",
         "PUT",
@@ -39,7 +40,7 @@ def statement_statement(s):
     return ast.StatementPair(s[0], s[1])
 
 
-@pg.production("statement : PUT expression")
+@pg.production("statement : PUT expression ;")
 def println_expression(s):
     return ast.PutStatement(s[1])
 

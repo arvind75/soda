@@ -3,15 +3,17 @@ from soda.errors import sodaError
 
 whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
-symbols = "()+-*/%^\"#"
+symbols = ";()+-*/%^\"#"
 alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 numeric = "0123456789"
+insertsemi = ["number", "string", ")"]
 reserved = ["put", "fetch"]
 
 
 class Lexer(BaseBox):
     def __init__(self):
         self.packages = []
+        self.lasttoken = ""
         self.idx = 0
         self.lineno = 1
         self.colno = 1
@@ -29,17 +31,39 @@ class Lexer(BaseBox):
                 i += 1
                 continue
             elif source[i] == "\n":
+                if self.lasttoken in insertsemi:
+                    self.lasttoken = ";"
+                    yield Token(name=";", value=";",
+                                source_pos=SourcePosition(idx=self.idx,
+                                                          lineno=self.lineno,
+                                                          colno=self.colno))
                 self.colno = 1
                 self.lineno += 1
                 i += 1
                 continue
             elif source[i] == "\r" and source[i + 1] == "\n":
+                if self.lasttoken in insertsemi:
+                    self.lasttoken = ";"
+                    yield Token(name=";", value=";",
+                                source_pos=SourcePosition(idx=self.idx,
+                                                          lineno=self.lineno,
+                                                          colno=self.colno))
                 self.colno = 1
                 self.lineno += 1
                 i += 2
                 continue
             elif source[i] in symbols:
-                if source[i] == "(":
+                if source[i] == ";":
+                    self.lasttoken = ";"
+                    yield Token(name=";", value=";",
+                                source_pos=SourcePosition(idx=self.idx,
+                                                          lineno=self.lineno,
+                                                          colno=self.colno))
+                    self.colno += 1
+                    i += 1
+                    continue
+                elif source[i] == "(":
+                    self.lasttoken = "("
                     yield Token(name="(", value="(",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -48,6 +72,7 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == ")":
+                    self.lasttoken = ")"
                     yield Token(name=")", value=")",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -60,8 +85,9 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "operator and its operands must " +
+                                "binary operator and its operands must " +
                                 "be separated by whitespace")
+                            self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
                                         source_pos=SourcePosition(
                                             idx=self.idx,
@@ -72,12 +98,14 @@ class Lexer(BaseBox):
                         msg = (
                             "operator and its operands must "
                             "be separated by whitespace")
+                        self.lasttoken = "error"
                         yield Token(name="ERROR", value=msg,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
+                    self.lasttoken = "+"
                     yield Token(name="+", value="+",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -99,6 +127,7 @@ class Lexer(BaseBox):
                             except IndexError:
                                 break
                         i = j
+                        self.lasttoken = "number"
                         yield Token(name="NUMBER", value="".join(value),
                                     source_pos=SourcePosition(
                                         idx=self.idx,
@@ -111,8 +140,9 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "operator and its operands must " +
+                                "binary operator and its operands must " +
                                 "be separated by whitespace")
+                            self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
                                         source_pos=SourcePosition(
                                             idx=self.idx,
@@ -123,12 +153,14 @@ class Lexer(BaseBox):
                         msg = (
                             "operator and its operands must "
                             "be separated by whitespace")
+                        self.lasttoken = "error"
                         yield Token(name="ERROR", value=msg,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
+                    self.lasttoken = "-"
                     yield Token(name="-", value="-",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -143,6 +175,7 @@ class Lexer(BaseBox):
                             msg = (
                                 "operator and its operands must "
                                 "be separated by whitespace")
+                            self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
                                         source_pos=SourcePosition(
                                             idx=self.idx,
@@ -153,12 +186,14 @@ class Lexer(BaseBox):
                         msg = (
                             "operator and its operands must "
                             "be separated by whitespace")
+                        self.lasttoken = "error"
                         yield Token(name="ERROR", value=msg,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
+                    self.lasttoken = "*"
                     yield Token(name="*", value="*",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -171,8 +206,9 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "operator and its operands must " +
+                                "binary operator and its operands must " +
                                 "be separated by whitespace")
+                            self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
                                         source_pos=SourcePosition(
                                             idx=self.idx,
@@ -183,12 +219,14 @@ class Lexer(BaseBox):
                         msg = (
                             "operator and its operands must "
                             "be separated by whitespace")
+                        self.lasttoken = "error"
                         yield Token(name="ERROR", value=msg,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
+                    self.lasttoken = "/"
                     yield Token(name="/", value="/",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -201,8 +239,9 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "operator and its operands must " +
+                                "binary operator and its operands must " +
                                 "be separated by whitespace")
+                            self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
                                         source_pos=SourcePosition(
                                             idx=self.idx,
@@ -213,12 +252,14 @@ class Lexer(BaseBox):
                         msg = (
                             "operator and its operands must "
                             "be separated by whitespace")
+                        self.lasttoken = "error"
                         yield Token(name="ERROR", value=msg,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
+                    self.lasttoken = "%"
                     yield Token(name="%", value="%",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -231,8 +272,9 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "operator and its operands must " +
+                                "binary operator and its operands must " +
                                 "be separated by whitespace")
+                            self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
                                         source_pos=SourcePosition(
                                             idx=self.idx,
@@ -243,12 +285,14 @@ class Lexer(BaseBox):
                         msg = (
                             "operator and its operands must "
                             "be separated by whitespace")
+                        self.lasttoken = "error"
                         yield Token(name="ERROR", value=msg,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
+                    self.lasttoken = "^"
                     yield Token(name="^", value="^",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -263,6 +307,7 @@ class Lexer(BaseBox):
                         source[j]
                     except IndexError:
                         msg = "string not terminated"
+                        self.lasttoken = "error"
                         yield Token(name="ERROR",
                                     value=msg,
                                     source_pos=SourcePosition(
@@ -275,6 +320,7 @@ class Lexer(BaseBox):
                             source[j + 1]
                         except IndexError:
                             msg = "string not terminated"
+                            self.lasttoken = "error"
                             yield Token(name="ERROR",
                                         value=msg,
                                         source_pos=SourcePosition(
@@ -284,6 +330,7 @@ class Lexer(BaseBox):
                             break
                         if source[j] in newlines:
                             msg = "newline in string"
+                            self.lasttoken = "error"
                             yield Token(name="ERROR",
                                         value=msg,
                                         source_pos=SourcePosition(
@@ -325,6 +372,7 @@ class Lexer(BaseBox):
                             else:
                                 msg = ("unknown escape sequence \\%s"
                                        % source[j + 1])
+                                self.lasttoken = "error"
                                 yield Token(name="ERROR",
                                             value=msg,
                                             source_pos=SourcePosition(
@@ -338,6 +386,7 @@ class Lexer(BaseBox):
                             value.append(source[j])
                             j += 1
                             k += 1
+                    self.lasttoken = "string"
                     yield Token(name="STRING", value="".join(value),
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
@@ -368,6 +417,7 @@ class Lexer(BaseBox):
                     except IndexError:
                         break
                 i = j
+                self.lasttoken = "number"
                 yield Token(name="NUMBER", value="".join(value),
                             source_pos=SourcePosition(idx=self.idx,
                                                       lineno=self.lineno,
@@ -389,12 +439,14 @@ class Lexer(BaseBox):
                 iden = "".join(value)
                 if iden in reserved:
                     if iden == "put":
+                        self.lasttoken = "put"
                         yield Token(name="PUT", value=iden,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
                     elif iden == "fetch":
+                        self.lasttoken = "fetch"
                         yield Token(name="FETCH", value=iden,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
@@ -408,6 +460,7 @@ class Lexer(BaseBox):
                 self.colno += k
             else:
                 msg = "unrecognized token %s" % source[i]
+                self.lasttoken = "error"
                 yield Token(name="ERROR",
                             value=msg,
                             source_pos=SourcePosition(
@@ -415,6 +468,13 @@ class Lexer(BaseBox):
                                 lineno=self.lineno,
                                 colno=self.colno))
                 break
+        if self.lasttoken in insertsemi:
+            self.lasttoken = ";"
+            yield Token(name=";", value=";",
+                        source_pos=SourcePosition(
+                            idx=self.idx,
+                            lineno=self.lineno,
+                            colno=self.colno))
 
 
 lexer = Lexer()

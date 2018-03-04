@@ -21,7 +21,8 @@ class Fetcher(object):
 
     def fetch(self):
         for package in self.packages:
-            fetch_found = False
+            fetchfound = False
+            packagefound = False
             filepath = self.pathtopackage[package] + package + ".na"
             try:
                 sourcefile = open_file_as_stream(filepath)
@@ -37,7 +38,7 @@ class Fetcher(object):
             tokenlist = []
             if not self.data == "":
                 for token in lexer.lex(self.data, self.idx):
-                    if not fetch_found:
+                    if not fetchfound:
                         if token.name == "FETCH":
                             if not i == 0:
                                 sodaError(
@@ -48,30 +49,51 @@ class Fetcher(object):
                                 )
                             else:
                                 i += 1
-                                fetch_found = True
+                                fetchfound = True
                         else:
                             i += 1
                             tokenlist.append(token)
                     else:
                         if token.name == "STRING":
-                            pathlist = token.value.split("/")
-                            pname = pathlist.pop()
-                            fullpath = self.pathtopackage[
-                                package] + token.value
-                            if pname not in self.packages:
-                                self.addpackage(fullpath)
-                                self.tokentopackage[pname] = token
-                            elif pname == self.packages[0]:
+                            if not packagefound:
+                                pathlist = token.value.split("/")
+                                pname = pathlist.pop()
+                                fullpath = self.pathtopackage[
+                                    package] + token.value
+                                if pname not in self.packages:
+                                    self.addpackage(fullpath)
+                                    self.tokentopackage[pname] = token
+                                elif pname == self.packages[0]:
+                                    sodaError(
+                                        package,
+                                        str(token.getsourcepos().lineno),
+                                        str(token.getsourcepos().colno),
+                                        "cannot import root package \"%s\""
+                                        % pname
+                                    )
+                                packagefound = True
+                                continue
+                            else:
                                 sodaError(
                                     package,
                                     str(token.getsourcepos().lineno),
                                     str(token.getsourcepos().colno),
-                                    "cannot import root package \"%s\""
-                                    % pname
+                                    "unexpected string"
+                                )
+                        if token.name == ";":
+                            if packagefound:
+                                packagefound = False
+                                continue
+                            else:
+                                sodaError(
+                                    package,
+                                    str(token.getsourcepos().lineno),
+                                    str(token.getsourcepos().colno),
+                                    "unexpected ;"
                                 )
                         else:
                             tokenlist.append(token)
-                            fetch_found = False
+                            fetchfound = False
             self.idx += 1
             self.data = ""
             self.tokgeneratorlist.append(tokenlist)
