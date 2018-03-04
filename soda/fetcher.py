@@ -78,19 +78,12 @@ class Fetcher(object):
                                     package,
                                     str(token.getsourcepos().lineno),
                                     str(token.getsourcepos().colno),
-                                    "unexpected string"
+                                    "package names must be "
+                                    "separated by newlines"
                                 )
-                        if token.name == ";":
-                            if packagefound:
-                                packagefound = False
-                                continue
-                            else:
-                                sodaError(
-                                    package,
-                                    str(token.getsourcepos().lineno),
-                                    str(token.getsourcepos().colno),
-                                    "unexpected ;"
-                                )
+                        if token.name == "END":
+                            packagefound = False
+                            continue
                         else:
                             tokenlist.append(token)
                             fetchfound = False

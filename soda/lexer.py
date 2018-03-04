@@ -3,10 +3,10 @@ from soda.errors import sodaError
 
 whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
-symbols = ";()+-*/%^\"#"
-alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+symbols = "()+-*/%^\"#"
+alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 numeric = "0123456789"
-insertsemi = ["number", "string", ")"]
+insertend = ["number", "string", ")"]
 reserved = ["put", "fetch"]
 
 
@@ -31,9 +31,9 @@ class Lexer(BaseBox):
                 i += 1
                 continue
             elif source[i] == "\n":
-                if self.lasttoken in insertsemi:
-                    self.lasttoken = ";"
-                    yield Token(name=";", value=";",
+                if self.lasttoken in insertend:
+                    self.lasttoken = "END"
+                    yield Token(name="END", value="END",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
@@ -42,9 +42,9 @@ class Lexer(BaseBox):
                 i += 1
                 continue
             elif source[i] == "\r" and source[i + 1] == "\n":
-                if self.lasttoken in insertsemi:
-                    self.lasttoken = ";"
-                    yield Token(name=";", value=";",
+                if self.lasttoken in insertend:
+                    self.lasttoken = "END"
+                    yield Token(name="END", value="END",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
@@ -53,16 +53,7 @@ class Lexer(BaseBox):
                 i += 2
                 continue
             elif source[i] in symbols:
-                if source[i] == ";":
-                    self.lasttoken = ";"
-                    yield Token(name=";", value=";",
-                                source_pos=SourcePosition(idx=self.idx,
-                                                          lineno=self.lineno,
-                                                          colno=self.colno))
-                    self.colno += 1
-                    i += 1
-                    continue
-                elif source[i] == "(":
+                if source[i] == "(":
                     self.lasttoken = "("
                     yield Token(name="(", value="(",
                                 source_pos=SourcePosition(idx=self.idx,
@@ -468,9 +459,9 @@ class Lexer(BaseBox):
                                 lineno=self.lineno,
                                 colno=self.colno))
                 break
-        if self.lasttoken in insertsemi:
-            self.lasttoken = ";"
-            yield Token(name=";", value=";",
+        if self.lasttoken in insertend:
+            self.lasttoken = "END"
+            yield Token(name="END", value="END",
                         source_pos=SourcePosition(
                             idx=self.idx,
                             lineno=self.lineno,
