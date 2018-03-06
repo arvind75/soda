@@ -69,6 +69,46 @@ def run(frame, bc):
             left = frame.pop()
             result = right.pow(left)
             frame.push(result)
+        elif c == bytecode.EQ:
+            right = frame.pop()
+            left = frame.pop()
+            result = right.eq(left)
+            frame.push(result)
+        elif c == bytecode.NEQ:
+            right = frame.pop()
+            left = frame.pop()
+            result = right.neq(left)
+            frame.push(result)
+        elif c == bytecode.GRE:
+            right = frame.pop()
+            left = frame.pop()
+            result = right.gre(left)
+            frame.push(result)
+        elif c == bytecode.LES:
+            right = frame.pop()
+            left = frame.pop()
+            result = right.les(left)
+            frame.push(result)
+        elif c == bytecode.GEQ:
+            right = frame.pop()
+            left = frame.pop()
+            result = right.geq(left)
+            frame.push(result)
+        elif c == bytecode.LEQ:
+            right = frame.pop()
+            left = frame.pop()
+            result = right.leq(left)
+            frame.push(result)
+        elif c == bytecode.AND:
+            right = frame.pop()
+            left = frame.pop()
+            result = right.land(left)
+            frame.push(result)
+        elif c == bytecode.OR:
+            right = frame.pop()
+            left = frame.pop()
+            result = right.lor(left)
+            frame.push(result)
         elif c == bytecode.PUT:
             output = frame.pop().str()
             os.write(1, output)

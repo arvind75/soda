@@ -5,7 +5,15 @@ MUL = 4
 DIV = 5
 MOD = 6
 POW = 7
-PUT = 8
+EQ = 8
+NEQ = 9
+LES = 10
+GRE = 11
+LEQ = 12
+GEQ = 13
+AND = 14
+OR = 15
+PUT = 16
 
 BINOP_CODE = {
     "+": ADD,
@@ -13,7 +21,15 @@ BINOP_CODE = {
     "*": MUL,
     "/": DIV,
     "%": MOD,
-    "^": POW
+    "^": POW,
+    "==": EQ,
+    "!=": NEQ,
+    "<": LES,
+    ">": GRE,
+    "<=": LEQ,
+    ">=": GEQ,
+    "&": AND,
+    "|": OR
 }
 
 # names for dumping bc to terminal
@@ -26,6 +42,14 @@ NAMES = {
     DIV: "       DIV",
     MOD: "       MOD",
     POW: "       POW",
+    EQ: "        EQ",
+    NEQ: "       NEQ",
+    LES: "       LES",
+    GRE: "       GRE",
+    LEQ: "       LEQ",
+    GEQ: "       GEQ",
+    AND: "       AND",
+    OR: "        OR",
     PUT: "       PUT",
 }
 

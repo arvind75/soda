@@ -15,6 +15,15 @@ pg = ParserGenerator(
         "^",
         "(",
         ")",
+        "=",
+        "==",
+        "!=",
+        "<=",
+        ">=",
+        "<",
+        ">",
+        "&",
+        "|",
         "END",
         "NUMBER",
         "STRING",
@@ -22,6 +31,9 @@ pg = ParserGenerator(
         "ERROR"
     ],
     precedence=[
+        ("left", ["|"]),
+        ("left", ["&"]),
+        ("left", ["==", "!=", "<=", ">=", "<", ">"]),
         ("left", ["+", "-"]),
         ("left", ["*", "/", "%"]),
         ("left", ["^"])
@@ -51,6 +63,14 @@ def println_expression(s):
 @pg.production("expression : expression  /  expression")
 @pg.production("expression : expression  %  expression")
 @pg.production("expression : expression  ^  expression")
+@pg.production("expression : expression  ==  expression")
+@pg.production("expression : expression  !=  expression")
+@pg.production("expression : expression  <=  expression")
+@pg.production("expression : expression  >=  expression")
+@pg.production("expression : expression  <  expression")
+@pg.production("expression : expression  >  expression")
+@pg.production("expression : expression  &  expression")
+@pg.production("expression : expression  |  expression")
 def expression_binop(s):
     return ast.BinOp(s[1].getstr(), s[0], s[2])
 
