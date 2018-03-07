@@ -102,14 +102,14 @@ class SodaNumber(SodaObject):
 
     def eq(self, other):
         assert isinstance(other, SodaNumber)
-        if (self.value == other.value):
+        if (self.value.eq(other.value)):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
     def neq(self, other):
         assert isinstance(other, SodaNumber)
-        if (self.value != other.value):
+        if (self.value.ne(other.value)):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
