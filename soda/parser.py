@@ -8,7 +8,9 @@ from soda import ast
 pg = ParserGenerator(
     [
         "+",
+        "++",
         "-",
+        "--",
         "*",
         "/",
         "%",
@@ -34,7 +36,7 @@ pg = ParserGenerator(
         ("left", ["|"]),
         ("left", ["&"]),
         ("left", ["==", "!=", "<=", ">=", "<", ">"]),
-        ("left", ["+", "-"]),
+        ("left", ["+", "-", "++", "--"]),
         ("left", ["*", "/", "%"]),
         ("left", ["^"])
     ],
@@ -58,6 +60,8 @@ def println_expression(s):
 
 
 @pg.production("expression : expression  +  expression")
+@pg.production("expression : expression  ++  expression")
+@pg.production("expression : expression  --  expression")
 @pg.production("expression : expression  -  expression")
 @pg.production("expression : expression  *  expression")
 @pg.production("expression : expression  /  expression")

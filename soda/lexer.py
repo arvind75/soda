@@ -76,6 +76,18 @@ class Lexer(BaseBox):
                     try:
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
+                            if source[i + 1] == "+":
+                                if (source[i + 2] in whitespace and
+                                        source[i - 1] in whitespace):
+                                    yield Token(name="++", value="++",
+                                                source_pos=SourcePosition(
+                                                    idx=self.idx,
+                                                    lineno=self.lineno,
+                                                    colno=self.lineno))
+                                    self.lasttoken = "++"
+                                    self.colno += 2
+                                    i += 2
+                                    continue
                             msg = (
                                 "binary operator and its operands must " +
                                 "be separated by whitespace")
@@ -131,6 +143,18 @@ class Lexer(BaseBox):
                     try:
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
+                            if source[i + 1] == "-":
+                                if (source[i + 2] in whitespace and
+                                        source[i - 1] in whitespace):
+                                    yield Token(name="--", value="--",
+                                                source_pos=SourcePosition(
+                                                    idx=self.idx,
+                                                    lineno=self.lineno,
+                                                    colno=self.lineno))
+                                    self.lasttoken = "--"
+                                    self.colno += 2
+                                    i += 2
+                                    continue
                             msg = (
                                 "binary operator and its operands must " +
                                 "be separated by whitespace")

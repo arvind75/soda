@@ -42,15 +42,37 @@ def run(frame, bc):
         elif c == bytecode.ADD:
             right = frame.pop()
             left = frame.pop()
-            if not (right.isint() and left.isint() or
-                    right.isstr() and left.isstr()):
+            if not right.isint():
                 try:
                     right = right.toint()
+                except Exception:
+                    sodaError("placeholder", "-1", "-1", "cannot convert"
+                              " to int")
+            if not left.isint():
+                try:
                     left = left.toint()
                 except Exception:
-                    right = right.tostr()
-                    left = left.tostr()
+                    sodaError("placeholder", "-1", "-1", "cannot convert"
+                              " to int")
             result = right.add(left)
+            frame.push(result)
+        elif c == bytecode.CONCAT:
+            right = frame.pop()
+            left = frame.pop()
+            if not left.isstr():
+                left = left.tostr()
+            if not right.isstr():
+                right = right.tostr()
+            result = right.concat(left)
+            frame.push(result)
+        elif c == bytecode.DIFF:
+            right = frame.pop()
+            left = frame.pop()
+            if not left.isstr():
+                left = left.tostr()
+            if not right.isstr():
+                right = right.tostr()
+            result = right.diff(left)
             frame.push(result)
         elif c == bytecode.SUB:
             right = frame.pop()

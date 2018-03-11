@@ -1,22 +1,26 @@
 LOAD_CONST = 1
 ADD = 2
-SUB = 3
-MUL = 4
-DIV = 5
-MOD = 6
-POW = 7
-EQ = 8
-NE = 9
-GT = 10
-LT = 11
-GE = 12
-LE = 13
-AND = 14
-OR = 15
-PUT = 16
+CONCAT = 3
+DIFF = 4
+SUB = 5
+MUL = 6
+DIV = 7
+MOD = 8
+POW = 9
+EQ = 10
+NE = 11
+GT = 12
+LT = 13
+GE = 14
+LE = 15
+AND = 16
+OR = 17
+PUT = 18
 
 BINOP_CODE = {
     "+": ADD,
+    "++": CONCAT,
+    "--": DIFF,
     "-": SUB,
     "*": MUL,
     "/": DIV,
@@ -37,6 +41,8 @@ BINOP_CODE = {
 NAMES = {
     LOAD_CONST: "LOAD_CONST",
     ADD: "       ADD",
+    CONCAT: "    CONCAT",
+    DIFF: "      DIFF",
     SUB: "       SUB",
     MUL: "       MUL",
     DIV: "       DIV",

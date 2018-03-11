@@ -1,7 +1,8 @@
 from rply.token import BaseBox
-from rpython.rlib.rstring import UnicodeBuilder
+from rpython.rlib.rstring import UnicodeBuilder, replace
 from rpython.rlib.rbigint import rbigint
 import math
+
 
 class SodaObject(BaseBox):
     pass
@@ -12,12 +13,16 @@ class SodaString(SodaObject):
         assert isinstance(value, unicode)
         self.value = value
 
-    def add(self, other):
+    def concat(self, other):
         assert isinstance(other, SodaString)
         ustring = UnicodeBuilder()
         ustring.append(self.value)
         ustring.append(other.value)
         return SodaString(ustring.build())
+
+    def diff(self, other):
+        assert isinstance(other, SodaString)
+        return SodaString(replace(self.value, other.value, u""))
 
     def eq(self, other):
         assert isinstance(other, SodaString)
