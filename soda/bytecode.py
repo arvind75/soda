@@ -63,23 +63,28 @@ NAMES = {
 class Compiler(object):
     def __init__(self):
         self.stack = []
+        self.positions = []
         self.constants = []
 
     def register_constant(self, value):
         self.constants.append(value)
         return len(self.constants) - 1
 
-    def emit(self, code, arg=0):
+    def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)
         self.stack.append(arg)
+        self.positions.append(package)
+        self.positions.append(line)
+        self.positions.append(col)
 
     def create_bytecode(self):
-        return Bytecode(self.stack, self.constants[:])
+        return Bytecode(self.stack, self.positions, self.constants[:])
 
 
 class Bytecode(object):
-    def __init__(self, code, constants):
+    def __init__(self, code, positions, constants):
         self.code = code
+        self.positions = positions
         self.constants = constants
 
     def dump(self):

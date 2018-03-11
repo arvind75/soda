@@ -30,11 +30,17 @@ class Frame(object):
 
 def run(frame, bc):
     code = bc.code
+    positions = bc.positions
     pc = 0
+    posc = 0
     while pc < len(bc.code):
         driver.jit_merge_point(pc=pc, code=code, bc=bc, frame=frame)
         c = code[pc]
         arg = code[pc + 1]
+        package = positions[posc]
+        line = positions[posc + 1]
+        col = positions[posc + 2]
+        posc += 3
         pc += 2
         if c == bytecode.LOAD_CONST:
             const = bc.constants[arg]
@@ -46,14 +52,14 @@ def run(frame, bc):
                 try:
                     right = right.toint()
                 except Exception:
-                    sodaError("placeholder", "-1", "-1", "cannot convert"
-                              " to int")
+                    sodaError(package, line, col, "cannot add non-"
+                              "numeric types")
             if not left.isint():
                 try:
                     left = left.toint()
                 except Exception:
-                    sodaError("placeholder", "-1", "-1", "cannot convert"
-                              " to int")
+                    sodaError(package, line, col, "cannot add non-"
+                              "numeric types")
             result = right.add(left)
             frame.push(result)
         elif c == bytecode.CONCAT:

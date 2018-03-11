@@ -55,8 +55,12 @@ def statement_statement(s):
 
 
 @pg.production("statement : PUT expression END")
-def println_expression(s):
-    return ast.PutStatement(s[1])
+def put_expression(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.PutStatement(s[1], package, line, col)
 
 
 @pg.production("expression : expression  +  expression")
@@ -76,7 +80,12 @@ def println_expression(s):
 @pg.production("expression : expression  &  expression")
 @pg.production("expression : expression  |  expression")
 def expression_binop(s):
-    return ast.BinOp(s[1].getstr(), s[0], s[2])
+    sourcepos = s[1].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.BinOp(s[1].getstr(), s[0], s[2],
+                     package, line, col)
 
 
 @pg.production("expression : ( expression )")
@@ -86,9 +95,14 @@ def expression_paren(s):
 
 @pg.production("expression : NUMBER")
 def expression_number(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
     try:
         a = rbigint()
-        return ast.Integer(a.fromstr(s[0].getstr()))
+        return ast.Integer(a.fromstr(s[0].getstr()),
+                           package, line, col)
     except Exception:
         package = fetcher.packages[s[0].getsourcepos().idx]
         line = str(s[0].getsourcepos().lineno)
@@ -104,9 +118,13 @@ def expression_stringliteral(s):
 
 @pg.production("stringliteral : STRING")
 def stringliteral_string(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
     string = s[0].getstr()
     string, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.String(string)
+    return ast.String(string, package, line, col)
 
 
 @pg.error
