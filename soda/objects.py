@@ -1,6 +1,7 @@
 from rply.token import BaseBox
+from rpython.rlib.rstring import UnicodeBuilder
 from rpython.rlib.rbigint import rbigint
-
+import math
 
 class SodaObject(BaseBox):
     pass
@@ -11,6 +12,13 @@ class SodaString(SodaObject):
         assert isinstance(value, unicode)
         self.value = value
 
+    def add(self, other):
+        assert isinstance(other, SodaString)
+        ustring = UnicodeBuilder()
+        ustring.append(self.value)
+        ustring.append(other.value)
+        return SodaString(ustring.build())
+
     def eq(self, other):
         assert isinstance(other, SodaString)
         if (self.value == other.value):
@@ -18,35 +26,35 @@ class SodaString(SodaObject):
         else:
             return SodaString(u"false")
 
-    def neq(self, other):
+    def ne(self, other):
         assert isinstance(other, SodaString)
         if (self.value != other.value):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def gre(self, other):
+    def gt(self, other):
         assert isinstance(other, SodaString)
         if (self.value > other.value):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def les(self, other):
+    def lt(self, other):
         assert isinstance(other, SodaString)
         if (self.value < other.value):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def geq(self, other):
+    def ge(self, other):
         assert isinstance(other, SodaString)
         if (self.value >= other.value):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def leq(self, other):
+    def le(self, other):
         assert isinstance(other, SodaString)
         if (self.value <= other.value):
             return SodaString(u"true")
@@ -67,81 +75,197 @@ class SodaString(SodaObject):
         else:
             return SodaString(u"false")
 
+    def isstr(self):
+        return True
+
+    def isint(self):
+        return False
+
+    def toint(self):
+        a = rbigint()
+        number = a.fromstr(str(self.value))
+        return SodaInt(number)
+
+    def tostr(self):
+        return SodaString(self.value)
+
     def str(self):
         return self.value.encode("utf-8")
 
 
-class SodaNumber(SodaObject):
+class SodaInt(SodaObject):
     def __init__(self, value):
         assert isinstance(value, rbigint)
         self.value = value
 
     def add(self, other):
-        assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value.add(other.value))
+        assert isinstance(other, SodaInt)
+        return SodaInt(self.value.add(other.value))
 
     def sub(self, other):
-        assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value.sub(other.value))
+        assert isinstance(other, SodaInt)
+        return SodaInt(self.value.sub(other.value))
 
     def mul(self, other):
-        assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value.mul(other.value))
+        assert isinstance(other, SodaInt)
+        return SodaInt(self.value.mul(other.value))
 
     def div(self, other):
-        assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value.floordiv(other.value))
+        assert isinstance(other, SodaInt)
+        return SodaInt(self.value.floordiv(other.value))
 
     def mod(self, other):
-        assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value.mod(other.value))
+        assert isinstance(other, SodaInt)
+        return SodaInt(self.value.mod(other.value))
 
     def pow(self, other):
-        assert isinstance(other, SodaNumber)
-        return SodaNumber(self.value.pow(other.value))
+        assert isinstance(other, SodaInt)
+        return SodaInt(self.value.pow(other.value))
 
     def eq(self, other):
-        assert isinstance(other, SodaNumber)
+        assert isinstance(other, SodaInt)
         if (self.value.eq(other.value)):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def neq(self, other):
-        assert isinstance(other, SodaNumber)
+    def ne(self, other):
+        assert isinstance(other, SodaInt)
         if (self.value.ne(other.value)):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def gre(self, other):
-        assert isinstance(other, SodaNumber)
+    def gt(self, other):
+        assert isinstance(other, SodaInt)
         if (self.value.gt(other.value)):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def les(self, other):
-        assert isinstance(other, SodaNumber)
+    def lt(self, other):
+        assert isinstance(other, SodaInt)
         if (self.value.lt(other.value)):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def geq(self, other):
-        assert isinstance(other, SodaNumber)
+    def ge(self, other):
+        assert isinstance(other, SodaInt)
         if (self.value.ge(other.value)):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
-    def leq(self, other):
-        assert isinstance(other, SodaNumber)
+    def le(self, other):
+        assert isinstance(other, SodaInt)
         if (self.value.le(other.value)):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
+    def isstr(self):
+        return False
+
+    def isint(self):
+        return True
+
+    def toint(self):
+        return SodaInt(self.value)
+
+    def tostr(self):
+        return SodaString(self.str().decode("utf-8"))
+
     def str(self):
         s = self.value.str()
+        return unicode(s).encode("utf-8")
+
+
+class SodaFloat(SodaObject):
+    def __init__(self, value):
+        assert isinstance(value, float)
+        self.value = value
+
+    def add(self, other):
+        assert isinstance(other, SodaFloat)
+        return SodaInt(self.value + other.value)
+
+    def sub(self, other):
+        assert isinstance(other, SodaFloat)
+        return SodaInt(self.value - other.value)
+
+    def mul(self, other):
+        assert isinstance(other, SodaFloat)
+        return SodaInt(self.value * other.value)
+
+    def div(self, other):
+        assert isinstance(other, SodaFloat)
+        return SodaInt(self.value / other.value)
+
+    def mod(self, other):
+        assert isinstance(other, SodaFloat)
+        return SodaInt(math.fmod(self.value, other.value))
+
+    def pow(self, other):
+        assert isinstance(other, SodaFloat)
+        return SodaInt(math.pow(self.value, other.value))
+
+    def eq(self, other):
+        assert isinstance(other, SodaFloat)
+        if (self.value == other.value):
+            return SodaString(u"true")
+        else:
+            return SodaString(u"false")
+
+    def ne(self, other):
+        assert isinstance(other, SodaFloat)
+        if (self.value != other.value):
+            return SodaString(u"true")
+        else:
+            return SodaString(u"false")
+
+    def gt(self, other):
+        assert isinstance(other, SodaFloat)
+        if (self.value > other.value):
+            return SodaString(u"true")
+        else:
+            return SodaString(u"false")
+
+    def lt(self, other):
+        assert isinstance(other, SodaFloat)
+        if (self.value < other.value):
+            return SodaString(u"true")
+        else:
+            return SodaString(u"false")
+
+    def ge(self, other):
+        assert isinstance(other, SodaFloat)
+        if (self.value >= other.value):
+            return SodaString(u"true")
+        else:
+            return SodaString(u"false")
+
+    def le(self, other):
+        assert isinstance(other, SodaFloat)
+        if (self.value <= other.value):
+            return SodaString(u"true")
+        else:
+            return SodaString(u"false")
+
+    def isstr(self):
+        return False
+
+    def isint(self):
+        return False
+
+    def toint(self):
+        a = rbigint()
+        number = a.fromfloat(self.value)
+        return SodaInt(number)
+
+    def tostr(self):
+        return SodaString(self.str().decode("utf-8"))
+
+    def str(self):
+        s = str(self.value)
         return unicode(s).encode("utf-8")

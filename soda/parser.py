@@ -82,8 +82,15 @@ def expression_paren(s):
 
 @pg.production("expression : NUMBER")
 def expression_number(s):
-    a = rbigint()
-    return ast.Number(a.fromstr(s[0].getstr()))
+    try:
+        a = rbigint()
+        return ast.Integer(a.fromstr(s[0].getstr()))
+    except Exception:
+        package = fetcher.packages[s[0].getsourcepos().idx]
+        line = str(s[0].getsourcepos().lineno)
+        col = str(s[0].getsourcepos().colno)
+        msg = "error in number %s" % s[0].getstr()
+        sodaError(package, line, col, msg)
 
 
 @pg.production("expression : stringliteral")

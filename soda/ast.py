@@ -1,6 +1,6 @@
 from rply.token import BaseBox
 from soda import bytecode
-from soda.objects import SodaNumber, SodaString
+from soda.objects import SodaInt, SodaString
 
 
 class Node(BaseBox):
@@ -34,13 +34,13 @@ class String(Node):
         compiler.emit(bytecode.LOAD_CONST, compiler.register_constant(ss))
 
 
-class Number(Node):
+class Integer(Node):
     def __init__(self, value):
         self.value = value
 
     def compile(self, compiler):
-        sn = SodaNumber(self.value)
-        compiler.emit(bytecode.LOAD_CONST, compiler.register_constant(sn))
+        si = SodaInt(self.value)
+        compiler.emit(bytecode.LOAD_CONST, compiler.register_constant(si))
 
 
 class BinOp(Node):

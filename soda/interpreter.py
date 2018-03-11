@@ -42,7 +42,15 @@ def run(frame, bc):
         elif c == bytecode.ADD:
             right = frame.pop()
             left = frame.pop()
-            result = left.add(right)
+            if not (right.isint() and left.isint() or
+                    right.isstr() and left.isstr()):
+                try:
+                    right = right.toint()
+                    left = left.toint()
+                except Exception:
+                    right = right.tostr()
+                    left = left.tostr()
+            result = right.add(left)
             frame.push(result)
         elif c == bytecode.SUB:
             right = frame.pop()
@@ -52,7 +60,7 @@ def run(frame, bc):
         elif c == bytecode.MUL:
             right = frame.pop()
             left = frame.pop()
-            result = left.mul(right)
+            result = right.mul(left)
             frame.push(result)
         elif c == bytecode.DIV:
             right = frame.pop()
@@ -74,30 +82,30 @@ def run(frame, bc):
             left = frame.pop()
             result = right.eq(left)
             frame.push(result)
-        elif c == bytecode.NEQ:
+        elif c == bytecode.NE:
             right = frame.pop()
             left = frame.pop()
-            result = right.neq(left)
+            result = right.ne(left)
             frame.push(result)
-        elif c == bytecode.GRE:
+        elif c == bytecode.GT:
             right = frame.pop()
             left = frame.pop()
-            result = right.gre(left)
+            result = right.gt(left)
             frame.push(result)
-        elif c == bytecode.LES:
+        elif c == bytecode.LT:
             right = frame.pop()
             left = frame.pop()
-            result = right.les(left)
+            result = right.lt(left)
             frame.push(result)
-        elif c == bytecode.GEQ:
+        elif c == bytecode.GE:
             right = frame.pop()
             left = frame.pop()
-            result = right.geq(left)
+            result = right.ge(left)
             frame.push(result)
-        elif c == bytecode.LEQ:
+        elif c == bytecode.LE:
             right = frame.pop()
             left = frame.pop()
-            result = right.leq(left)
+            result = right.le(left)
             frame.push(result)
         elif c == bytecode.AND:
             right = frame.pop()

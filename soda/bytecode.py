@@ -6,11 +6,11 @@ DIV = 5
 MOD = 6
 POW = 7
 EQ = 8
-NEQ = 9
-LES = 10
-GRE = 11
-LEQ = 12
-GEQ = 13
+NE = 9
+GT = 10
+LT = 11
+GE = 12
+LE = 13
 AND = 14
 OR = 15
 PUT = 16
@@ -23,11 +23,11 @@ BINOP_CODE = {
     "%": MOD,
     "^": POW,
     "==": EQ,
-    "!=": NEQ,
-    "<": LES,
-    ">": GRE,
-    "<=": LEQ,
-    ">=": GEQ,
+    "!=": NE,
+    "<": LT,
+    ">": GT,
+    "<=": LE,
+    ">=": GE,
     "&": AND,
     "|": OR
 }
@@ -43,11 +43,11 @@ NAMES = {
     MOD: "       MOD",
     POW: "       POW",
     EQ: "        EQ",
-    NEQ: "       NEQ",
-    LES: "       LES",
-    GRE: "       GRE",
-    LEQ: "       LEQ",
-    GEQ: "       GEQ",
+    NE: "        NE",
+    LT: "        LT",
+    GT: "        GT",
+    LE: "        LE",
+    GE: "        GE",
     AND: "       AND",
     OR: "        OR",
     PUT: "       PUT",
