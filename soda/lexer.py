@@ -5,8 +5,7 @@ whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
 symbols = "!=<>&|()+-*/%^\"#"
 alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
-numeric = "123456789"
-numeric2 = "0123456789"
+numeric = "0123456789"
 insertend = ["number", "string", ")"]
 reserved = ["put", "fetch"]
 
@@ -118,11 +117,11 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "-":
-                    if source[i + 1] in numeric2:
+                    if source[i + 1] in numeric:
                         k = 0
                         value.append("-")
                         j = i + 1
-                        while source[j] in numeric2:
+                        while source[j] in numeric:
                             value.append(source[j])
                             k += 1
                             j += 1
@@ -699,7 +698,7 @@ class Lexer(BaseBox):
             elif source[i] in numeric:
                 j = i
                 k = 0
-                while source[j] in numeric2:
+                while source[j] in numeric:
                     value.append(source[j])
                     j += 1
                     k += 1
