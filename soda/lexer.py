@@ -4,7 +4,6 @@ from soda.errors import sodaError
 whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
 symbols = "!=<>&|()+-*/%^\"#"
-alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 numeric = "0123456789"
 insertend = ["number", "string", ")"]
 reserved = ["put", "fetch"]
@@ -711,7 +710,7 @@ class Lexer(BaseBox):
                 self.colno += k
                 value = []
                 continue
-            elif source[i] in alpha:
+            else:
                 j = i
                 k = 0
                 while not source[j] in whitespace:
@@ -744,17 +743,6 @@ class Lexer(BaseBox):
                 value = []
                 i = j
                 self.colno += k
-            else:
-                # IDEN TOKEN HERE
-                msg = "Identity token not implemented" % source[i]
-                self.lasttoken = "error"
-                yield Token(name="ERROR",
-                            value=msg,
-                            source_pos=SourcePosition(
-                                idx=self.idx,
-                                lineno=self.lineno,
-                                colno=self.colno))
-                break
         if self.lasttoken in insertend:
             self.lasttoken = "END"
             yield Token(name="END", value="END",

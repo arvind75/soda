@@ -150,7 +150,7 @@ def error_handler(token):
     elif token.name == "ERROR":
         sodaError(package, line, col, token.value)
     else:
-        msg = "unexpected %s" % token.value
+        msg = "unexpected \"%s\"" % token.value
         sodaError(package, line, col, msg)
 
 
