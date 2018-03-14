@@ -117,28 +117,6 @@ class Lexer(BaseBox):
                     i += 1
                     continue
                 elif source[i] == "-":
-                    if source[i + 1] in numeric:
-                        k = 0
-                        value.append("-")
-                        j = i + 1
-                        while source[j] in numeric:
-                            value.append(source[j])
-                            k += 1
-                            j += 1
-                            try:
-                                source[j]
-                            except IndexError:
-                                break
-                        i = j
-                        self.lasttoken = "number"
-                        yield Token(name="NUMBER", value="".join(value),
-                                    source_pos=SourcePosition(
-                                        idx=self.idx,
-                                        lineno=self.lineno,
-                                        colno=self.colno))
-                        self.colno += k
-                        value = []
-                        continue
                     try:
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
@@ -154,6 +132,16 @@ class Lexer(BaseBox):
                                     self.colno += 2
                                     i += 2
                                     continue
+                            else:
+                                yield Token(name="NEG", value="NEG",
+                                            source_pos=SourcePosition(
+                                                idx=self.idx,
+                                                lineno=self.lineno,
+                                                colno=self.lineno))
+                                self.lasttoken = "NEG"
+                                self.colno += 1
+                                i += 1
+                                continue
                             msg = (
                                 "binary operator and its operands must " +
                                 "be separated by whitespace")
@@ -335,6 +323,7 @@ class Lexer(BaseBox):
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
+                            self.lasttoken = "=="
                             self.colno += 2
                             i += 2
                             continue
@@ -356,6 +345,7 @@ class Lexer(BaseBox):
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
+                            self.lasttoken = "="
                             self.colno += 1
                             i += 1
                             continue
@@ -390,19 +380,21 @@ class Lexer(BaseBox):
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
+                            self.lasttoken = "!="
                             self.colno += 2
                             i += 2
                             continue
                         else:
-                            msg = "unrecognized token %s" % source[i]
-                            self.lasttoken = "error"
-                            yield Token(name="ERROR",
-                                        value=msg,
+                            yield Token(name="!",
+                                        value="!",
                                         source_pos=SourcePosition(
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
-                            break
+                            self.lasttoken = "!"
+                            self.colno += 1
+                            i += 1
+                            continue
                     except IndexError:
                         msg = (
                             "binary operator and its operands must "
@@ -434,6 +426,7 @@ class Lexer(BaseBox):
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
+                            self.lasttoken = "<="
                             self.colno += 2
                             i += 2
                             continue
@@ -455,6 +448,7 @@ class Lexer(BaseBox):
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
+                            self.lasttoken = "<"
                             self.colno += 1
                             i += 1
                             continue
@@ -489,6 +483,7 @@ class Lexer(BaseBox):
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
+                            self.lasttoken = ">="
                             self.colno += 2
                             i += 2
                             continue
@@ -510,6 +505,7 @@ class Lexer(BaseBox):
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
+                            self.lasttoken = ">"
                             self.colno += 1
                             i += 1
                             continue
@@ -749,7 +745,8 @@ class Lexer(BaseBox):
                 i = j
                 self.colno += k
             else:
-                msg = "unrecognized token %s" % source[i]
+                # IDEN TOKEN HERE
+                msg = "Identity token not implemented" % source[i]
                 self.lasttoken = "error"
                 yield Token(name="ERROR",
                             value=msg,

@@ -26,6 +26,8 @@ pg = ParserGenerator(
         ">",
         "&",
         "|",
+        "!",
+        "NEG",
         "END",
         "NUMBER",
         "STRING",
@@ -38,7 +40,8 @@ pg = ParserGenerator(
         ("left", ["==", "!=", "<=", ">=", "<", ">"]),
         ("left", ["+", "-", "++", "--"]),
         ("left", ["*", "/", "%"]),
-        ("left", ["^"])
+        ("left", ["^"]),
+        ("left", ["NEG", "!"])
     ],
     cache_id="soda",
 )
@@ -86,6 +89,16 @@ def expression_binop(s):
     col = str(sourcepos.colno)
     return ast.BinOp(s[1].getstr(), s[0], s[2],
                      package, line, col)
+
+
+@pg.production("expression : ! expression")
+@pg.production("expression : NEG expression")
+def expression_unop(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.UnOp(s[0].getstr(), s[1], package, line, col)
 
 
 @pg.production("expression : ( expression )")

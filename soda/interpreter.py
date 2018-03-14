@@ -45,6 +45,16 @@ def run(frame, bc):
         if c == bytecode.LOAD_CONST:
             const = bc.constants[arg]
             frame.push(const)
+        elif c == bytecode.NEG:
+            operand = frame.pop()
+            if not operand.isint():
+                try:
+                    operand = operand.toint()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot negate non-integer string")
+            result = operand.neg()
+            frame.push(result)
         elif c == bytecode.ADD:
             right = frame.pop()
             left = frame.pop()
@@ -317,6 +327,12 @@ def run(frame, bc):
             if not right.isstr():
                 right = right.tostr()
             result = right.lor(left)
+            frame.push(result)
+        elif c == bytecode.NOT:
+            operand = frame.pop()
+            if not operand.isstr():
+                operand = operand.tostr()
+            result = operand.lnot()
             frame.push(result)
         elif c == bytecode.PUT:
             output = frame.pop().str()

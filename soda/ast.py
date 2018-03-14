@@ -67,6 +67,20 @@ class BinOp(Node):
                       self.package, self.line, self.col)
 
 
+class UnOp(Node):
+    def __init__(self, operator, operand, package, line, col):
+        self.operand = operand
+        self.operator = operator
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        self.operand.compile(compiler)
+        compiler.emit(bytecode.UNOP_CODE[self.operator], 0,
+                      self.package, self.line, self.col)
+
+
 class PutStatement(Node):
     def __init__(self, expr, package, line, col):
         self.expr = expr

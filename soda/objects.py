@@ -80,6 +80,12 @@ class SodaString(SodaObject):
         else:
             return SodaString(u"false")
 
+    def lnot(self):
+        if self.value == u"true":
+            return SodaString(u"false")
+        else:
+            return SodaString(u"true")
+
     def isstr(self):
         return True
 
@@ -168,6 +174,9 @@ class SodaInt(SodaObject):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
+
+    def neg(self):
+        return SodaInt(self.value.neg())
 
     def isstr(self):
         return False

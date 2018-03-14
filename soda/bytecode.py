@@ -1,3 +1,4 @@
+
 LOAD_CONST = 1
 ADD = 2
 CONCAT = 3
@@ -15,7 +16,9 @@ GE = 14
 LE = 15
 AND = 16
 OR = 17
-PUT = 18
+NEG = 18
+NOT = 19
+PUT = 20
 
 BINOP_CODE = {
     "+": ADD,
@@ -33,7 +36,12 @@ BINOP_CODE = {
     "<=": LE,
     ">=": GE,
     "&": AND,
-    "|": OR
+    "|": OR,
+}
+
+UNOP_CODE = {
+    "NEG": NEG,
+    "!": NOT
 }
 
 # names for dumping bc to terminal
@@ -56,6 +64,8 @@ NAMES = {
     GE: "        GE",
     AND: "       AND",
     OR: "        OR",
+    NEG: "       NEG",
+    NOT: "       NOT",
     PUT: "       PUT",
 }
 
