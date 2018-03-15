@@ -18,7 +18,6 @@ pg = ParserGenerator(
         "(",
         ")",
         "=",
-        "==",
         "!=",
         "<=",
         ">=",
@@ -31,13 +30,14 @@ pg = ParserGenerator(
         "END",
         "NUMBER",
         "STRING",
+        "IDENTIFIER",
         "PUT",
         "ERROR"
     ],
     precedence=[
         ("left", ["|"]),
         ("left", ["&"]),
-        ("left", ["==", "!=", "<=", ">=", "<", ">"]),
+        ("left", ["=", "!=", "<=", ">=", "<", ">"]),
         ("left", ["+", "-", "++", "--"]),
         ("left", ["*", "/", "%"]),
         ("left", ["^"]),
@@ -74,7 +74,7 @@ def put_expression(s):
 @pg.production("expression : expression  /  expression")
 @pg.production("expression : expression  %  expression")
 @pg.production("expression : expression  ^  expression")
-@pg.production("expression : expression  ==  expression")
+@pg.production("expression : expression  =  expression")
 @pg.production("expression : expression  !=  expression")
 @pg.production("expression : expression  <=  expression")
 @pg.production("expression : expression  >=  expression")

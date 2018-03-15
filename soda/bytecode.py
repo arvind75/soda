@@ -29,7 +29,7 @@ BINOP_CODE = {
     "/": DIV,
     "%": MOD,
     "^": POW,
-    "==": EQ,
+    "=": EQ,
     "!=": NE,
     "<": LT,
     ">": GT,
