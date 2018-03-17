@@ -15,6 +15,7 @@ pg = ParserGenerator(
         "/",
         "%",
         "^",
+        ":",
         "(",
         ")",
         "=",
@@ -31,8 +32,7 @@ pg = ParserGenerator(
         "NUMBER",
         "STRING",
         "IDENTIFIER",
-        "PUT",
-        "ERROR"
+        "PUT"
     ],
     precedence=[
         ("left", ["|"]),
@@ -64,6 +64,15 @@ def put_expression(s):
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.PutStatement(s[1], package, line, col)
+
+
+@pg.production("statement : identifierlist : expressionlist END")
+def assignment(s):
+    sourcepos = s[1].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Assignment(s[0], s[2], package, line, col)
 
 
 @pg.production("expression : expression  +  expression")
@@ -122,6 +131,33 @@ def expression_number(s):
         col = str(s[0].getsourcepos().colno)
         msg = "error in number %s" % s[0].getstr()
         sodaError(package, line, col, msg)
+
+
+@pg.production("expressionlist : expression")
+def expression_list(s):
+    return s[0]
+
+
+@pg.production("identifierlist : IDENTIFIER")
+def identifier_list(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    string = s[0].getstr()
+    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+    return ast.Identifier(iden, package, line, col)
+
+
+@pg.production("expression : IDENTIFIER")
+def expression_iden(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    string = s[0].getstr()
+    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+    return ast.Identifier(iden, package, line, col)
 
 
 @pg.production("expression : stringliteral")

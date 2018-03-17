@@ -11,6 +11,7 @@ driver = jit.JitDriver(greens=["pc", "code", "bc"],
 class Frame(object):
     def __init__(self, bc):
         self.valuestack = [None] * len(bc.code)
+        self.variables = [None] * bc.numvars
         self.valuestack_pos = 0
 
     def push(self, value):
@@ -45,6 +46,8 @@ def run(frame, bc):
         if c == bytecode.LOAD_CONST:
             const = bc.constants[arg]
             frame.push(const)
+        elif c == bytecode.LOAD_VAR:
+            frame.push(frame.variables[arg])
         elif c == bytecode.NEG:
             operand = frame.pop()
             if not operand.isint():
@@ -334,6 +337,8 @@ def run(frame, bc):
                 operand = operand.tostr()
             result = operand.lnot()
             frame.push(result)
+        elif c == bytecode.ASSIGN:
+            frame.variables[arg] = frame.pop()
         elif c == bytecode.PUT:
             output = frame.pop().str()
             os.write(1, output)

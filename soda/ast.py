@@ -51,6 +51,34 @@ class Integer(Node):
                       self.package, self.line, self.col)
 
 
+class Identifier(Node):
+    def __init__(self, value, package, line, col):
+        self.value = value
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        compiler.emit(bytecode.LOAD_VAR,
+                      compiler.register_variable(self.value),
+                      self.package, self.line, self.col)
+
+
+class Assignment(Node):
+    def __init__(self, idens, exprs, package, line, col):
+        self.idens = idens
+        self.exprs = exprs
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        self.idens.compile(compiler)
+        self.exprs.compile(compiler)
+        compiler.emit(bytecode.ASSIGN, 0,
+                      self.package, self.line, self.col)
+
+
 class BinOp(Node):
     def __init__(self, operator, left, right, package, line, col):
         self.left = left

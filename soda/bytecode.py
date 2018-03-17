@@ -1,24 +1,25 @@
-
 LOAD_CONST = 1
-ADD = 2
-CONCAT = 3
-DIFF = 4
-SUB = 5
-MUL = 6
-DIV = 7
-MOD = 8
-POW = 9
-EQ = 10
-NE = 11
-GT = 12
-LT = 13
-GE = 14
-LE = 15
-AND = 16
-OR = 17
-NEG = 18
-NOT = 19
-PUT = 20
+LOAD_VAR = 2
+ADD = 3
+CONCAT = 4
+DIFF = 5
+SUB = 6
+MUL = 7
+DIV = 8
+MOD = 9
+POW = 10
+EQ = 11
+NE = 12
+GT = 13
+LT = 14
+GE = 15
+LE = 16
+AND = 17
+OR = 18
+NEG = 19
+NOT = 20
+ASSIGN = 21
+PUT = 22
 
 BINOP_CODE = {
     "+": ADD,
@@ -48,6 +49,7 @@ UNOP_CODE = {
 # spacing is odd because rpython disallows conventional string formatting
 NAMES = {
     LOAD_CONST: "LOAD_CONST",
+    LOAD_VAR: "  LOAD_VAR",
     ADD: "       ADD",
     CONCAT: "    CONCAT",
     DIFF: "      DIFF",
@@ -66,6 +68,7 @@ NAMES = {
     OR: "        OR",
     NEG: "       NEG",
     NOT: "       NOT",
+    ASSIGN: "    ASSIGN",
     PUT: "       PUT",
 }
 
@@ -75,10 +78,20 @@ class Compiler(object):
         self.stack = []
         self.positions = []
         self.constants = []
+        self.variables = []
+        self.varpositions = {}
 
     def register_constant(self, value):
         self.constants.append(value)
         return len(self.constants) - 1
+
+    def register_variable(self, name):
+        try:
+            return self.varpositions[name]
+        except KeyError:
+            self.varpositions[name] = len(self.variables)
+            self.variables.append(name)
+            return len(self.variables) - 1
 
     def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)
@@ -88,14 +101,16 @@ class Compiler(object):
         self.positions.append(col)
 
     def create_bytecode(self):
-        return Bytecode(self.stack, self.positions, self.constants[:])
+        return Bytecode(self.stack, self.positions, self.constants[:],
+                        len(self.variables))
 
 
 class Bytecode(object):
-    def __init__(self, code, positions, constants):
+    def __init__(self, code, positions, constants, numvars):
         self.code = code
         self.positions = positions
         self.constants = constants
+        self.numvars = numvars
 
     def dump(self):
         formatted = []

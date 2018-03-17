@@ -6,6 +6,9 @@ from soda.fetcher import fetcher
 import os
 import sys
 
+# TODO check for empty initialization file
+# TODO REPL or crash on no init file
+
 
 def main(argv):
     isdump = False

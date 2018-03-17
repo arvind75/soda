@@ -1,7 +1,6 @@
 from rply.token import BaseBox
 from rpython.rlib.rstring import UnicodeBuilder, replace
 from rpython.rlib.rbigint import rbigint
-import math
 
 
 class SodaObject(BaseBox):
