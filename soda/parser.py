@@ -66,13 +66,15 @@ def put_expression(s):
     return ast.PutStatement(s[1], package, line, col)
 
 
-@pg.production("statement : identifierlist : expressionlist END")
+@pg.production("statement : IDENTIFIER : expression END")
 def assignment(s):
     sourcepos = s[1].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Assignment(s[0], s[2], package, line, col)
+    string = s[0].getstr()
+    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+    return ast.Assignment(iden, s[2], package, line, col)
 
 
 @pg.production("expression : expression  +  expression")
@@ -133,22 +135,6 @@ def expression_number(s):
         sodaError(package, line, col, msg)
 
 
-@pg.production("expressionlist : expression")
-def expression_list(s):
-    return s[0]
-
-
-@pg.production("identifierlist : IDENTIFIER")
-def identifier_list(s):
-    sourcepos = s[0].getsourcepos()
-    package = fetcher.packages[sourcepos.idx]
-    line = str(sourcepos.lineno)
-    col = str(sourcepos.colno)
-    string = s[0].getstr()
-    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.Identifier(iden, package, line, col)
-
-
 @pg.production("expression : IDENTIFIER")
 def expression_iden(s):
     sourcepos = s[0].getsourcepos()
@@ -157,7 +143,7 @@ def expression_iden(s):
     col = str(sourcepos.colno)
     string = s[0].getstr()
     iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.Identifier(iden, package, line, col)
+    return ast.Variable(iden, package, line, col)
 
 
 @pg.production("expression : stringliteral")

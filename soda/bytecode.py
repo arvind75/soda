@@ -1,24 +1,24 @@
 LOAD_CONST = 1
 LOAD_VAR = 2
-ADD = 3
-CONCAT = 4
-DIFF = 5
-SUB = 6
-MUL = 7
-DIV = 8
-MOD = 9
-POW = 10
-EQ = 11
-NE = 12
-GT = 13
-LT = 14
-GE = 15
-LE = 16
-AND = 17
-OR = 18
-NEG = 19
-NOT = 20
-ASSIGN = 21
+STORE_VAR = 3
+ADD = 4
+CONCAT = 5
+DIFF = 6
+SUB = 7
+MUL = 8
+DIV = 9
+MOD = 10
+POW = 11
+EQ = 12
+NE = 13
+GT = 14
+LT = 15
+GE = 16
+LE = 17
+AND = 18
+OR = 19
+NEG = 20
+NOT = 21
 PUT = 22
 
 BINOP_CODE = {
@@ -50,6 +50,7 @@ UNOP_CODE = {
 NAMES = {
     LOAD_CONST: "LOAD_CONST",
     LOAD_VAR: "  LOAD_VAR",
+    STORE_VAR: " STORE_VAR",
     ADD: "       ADD",
     CONCAT: "    CONCAT",
     DIFF: "      DIFF",
@@ -68,7 +69,6 @@ NAMES = {
     OR: "        OR",
     NEG: "       NEG",
     NOT: "       NOT",
-    ASSIGN: "    ASSIGN",
     PUT: "       PUT",
 }
 
@@ -78,20 +78,15 @@ class Compiler(object):
         self.stack = []
         self.positions = []
         self.constants = []
-        self.variables = []
-        self.varpositions = {}
+        self.variables = {}
 
     def register_constant(self, value):
         self.constants.append(value)
         return len(self.constants) - 1
 
     def register_variable(self, name):
-        try:
-            return self.varpositions[name]
-        except KeyError:
-            self.varpositions[name] = len(self.variables)
-            self.variables.append(name)
-            return len(self.variables) - 1
+        self.variables[name] = len(self.variables)
+        return len(self.variables) - 1
 
     def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)

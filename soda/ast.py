@@ -51,7 +51,7 @@ class Integer(Node):
                       self.package, self.line, self.col)
 
 
-class Identifier(Node):
+class Variable(Node):
     def __init__(self, value, package, line, col):
         self.value = value
         self.package = package
@@ -60,7 +60,7 @@ class Identifier(Node):
 
     def compile(self, compiler):
         compiler.emit(bytecode.LOAD_VAR,
-                      compiler.register_variable(self.value),
+                      compiler.variables.get(self.value, -1),
                       self.package, self.line, self.col)
 
 
@@ -73,9 +73,9 @@ class Assignment(Node):
         self.col = col
 
     def compile(self, compiler):
-        self.idens.compile(compiler)
         self.exprs.compile(compiler)
-        compiler.emit(bytecode.ASSIGN, 0,
+        compiler.emit(bytecode.STORE_VAR,
+                      compiler.register_variable(self.idens),
                       self.package, self.line, self.col)
 
 

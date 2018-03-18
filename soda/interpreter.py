@@ -47,7 +47,14 @@ def run(frame, bc):
             const = bc.constants[arg]
             frame.push(const)
         elif c == bytecode.LOAD_VAR:
-            frame.push(frame.variables[arg])
+            if arg == -1:
+                sodaError(package, line, col,
+                          "cannot evaluate undeclared variable")
+            var = frame.variables[arg]
+            frame.push(var)
+        elif c == bytecode.STORE_VAR:
+            value = frame.pop()
+            frame.variables[arg] = value
         elif c == bytecode.NEG:
             operand = frame.pop()
             if not operand.isint():
@@ -337,8 +344,6 @@ def run(frame, bc):
                 operand = operand.tostr()
             result = operand.lnot()
             frame.push(result)
-        elif c == bytecode.ASSIGN:
-            frame.variables[arg] = frame.pop()
         elif c == bytecode.PUT:
             output = frame.pop().str()
             os.write(1, output)
