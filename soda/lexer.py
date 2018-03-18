@@ -53,18 +53,28 @@ class Lexer(BaseBox):
             elif source[i] in symbols:
                 if source[i] == ":":
                     try:
-                        if not (source[i + 1] in whitespace and source[i - 1]
-                           in whitespace):
-                            msg = (
-                                "assignment operator and its operands must " +
-                                "be separated by whitespace")
-                            self.lasttoken = "error"
-                            yield Token(name="ERROR", value=msg,
+                        if source[i + 1] == "=":
+                            if not (source[i + 2] in whitespace and
+                                    source[i - 1] in whitespace):
+                                msg = (
+                                    "assignment operator and its operands must"
+                                    " be separated by whitespace")
+                                self.lasttoken = "error"
+                                yield Token(name="ERROR", value=msg,
+                                            source_pos=SourcePosition(
+                                                idx=self.idx,
+                                                lineno=self.lineno,
+                                                colno=self.colno))
+                                break
+                            yield Token(name=":=", value=":=",
                                         source_pos=SourcePosition(
                                             idx=self.idx,
                                             lineno=self.lineno,
                                             colno=self.colno))
-                            break
+                            self.lasttoken = ":="
+                            self.colno += 2
+                            i += 2
+                            continue
                     except IndexError:
                         msg = (
                             "assignment operator and its operands must "
@@ -76,14 +86,16 @@ class Lexer(BaseBox):
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
-                    self.lasttoken = ":"
-                    yield Token(name=":", value=":",
-                                source_pos=SourcePosition(idx=self.idx,
-                                                          lineno=self.lineno,
-                                                          colno=self.colno))
-                    self.colno += 1
-                    i += 1
-                    continue
+                    else:
+                        msg = (
+                            "unexpected \":\"")
+                        self.lasttoken = "error"
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
                 elif source[i] == "(":
                     self.lasttoken = "("
                     yield Token(name="(", value="(",
@@ -119,7 +131,7 @@ class Lexer(BaseBox):
                                     i += 2
                                     continue
                             msg = (
-                                "binary operator and its operands must " +
+                                "binary operator and its operands must "
                                 "be separated by whitespace")
                             self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
@@ -174,7 +186,7 @@ class Lexer(BaseBox):
                                 i += 1
                                 continue
                             msg = (
-                                "binary operator and its operands must " +
+                                "binary operator and its operands must "
                                 "be separated by whitespace")
                             self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
@@ -240,7 +252,7 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "binary operator and its operands must " +
+                                "binary operator and its operands must "
                                 "be separated by whitespace")
                             self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
@@ -273,7 +285,7 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "binary operator and its operands must " +
+                                "binary operator and its operands must "
                                 "be separated by whitespace")
                             self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
@@ -306,7 +318,7 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "binary operator and its operands must " +
+                                "binary operator and its operands must "
                                 "be separated by whitespace")
                             self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
@@ -339,7 +351,7 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and
                                 source[i - 1] in whitespace):
                             msg = (
-                                "binary operator and its operands must " +
+                                "binary operator and its operands must "
                                 "be separated by whitespace")
                             self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
@@ -374,7 +386,7 @@ class Lexer(BaseBox):
                             if not (source[i + 2] in whitespace and
                                     source[i - 1] in whitespace):
                                 msg = (
-                                    "binary operator and its operands must " +
+                                    "binary operator and its operands must "
                                     "be separated by whitespace")
                                 self.lasttoken = "error"
                                 yield Token(name="ERROR", value=msg,
@@ -404,8 +416,8 @@ class Lexer(BaseBox):
                             i += 1
                             continue
                         else:
-                            msg = "unary operator must be "\
-                                  "prepended to its operand"
+                            msg = ("unary operator must be "
+                                   "prepended to its operand")
                             yield Token(name="ERROR",
                                         value=msg,
                                         source_pos=SourcePosition(
@@ -430,7 +442,7 @@ class Lexer(BaseBox):
                             if not (source[i + 2] in whitespace and
                                     source[i - 1] in whitespace):
                                 msg = (
-                                    "binary operator and its operands must " +
+                                    "binary operator and its operands must "
                                     "be separated by whitespace")
                                 self.lasttoken = "error"
                                 yield Token(name="ERROR", value=msg,
@@ -452,7 +464,7 @@ class Lexer(BaseBox):
                             if not (source[i + 1] in whitespace and
                                     source[i - 1] in whitespace):
                                 msg = (
-                                    "binary operator and its operands must " +
+                                    "binary operator and its operands must "
                                     "be separated by whitespace")
                                 self.lasttoken = "error"
                                 yield Token(name="ERROR", value=msg,
@@ -487,7 +499,7 @@ class Lexer(BaseBox):
                             if not (source[i + 2] in whitespace and
                                     source[i - 1] in whitespace):
                                 msg = (
-                                    "binary operator and its operands must " +
+                                    "binary operator and its operands must "
                                     "be separated by whitespace")
                                 self.lasttoken = "error"
                                 yield Token(name="ERROR", value=msg,
@@ -509,7 +521,7 @@ class Lexer(BaseBox):
                             if not (source[i + 1] in whitespace and
                                     source[i - 1] in whitespace):
                                 msg = (
-                                    "binary operator and its operands must " +
+                                    "binary operator and its operands must "
                                     "be separated by whitespace")
                                 self.lasttoken = "error"
                                 yield Token(name="ERROR", value=msg,
@@ -543,7 +555,7 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "binary operator and its operands must " +
+                                "binary operator and its operands must "
                                 "be separated by whitespace")
                             self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
@@ -576,7 +588,7 @@ class Lexer(BaseBox):
                         if not (source[i + 1] in whitespace and source[i - 1]
                            in whitespace):
                             msg = (
-                                "binary operator and its operands must " +
+                                "binary operator and its operands must "
                                 "be separated by whitespace")
                             self.lasttoken = "error"
                             yield Token(name="ERROR", value=msg,
@@ -732,7 +744,8 @@ class Lexer(BaseBox):
             else:
                 j = i
                 k = 0
-                while not source[j] in whitespace:
+                while not (source[j] in whitespace or
+                           source[j] in symbols):
                     value.append(source[j])
                     j += 1
                     k += 1

@@ -85,8 +85,11 @@ class Compiler(object):
         return len(self.constants) - 1
 
     def register_variable(self, name):
-        self.variables[name] = len(self.variables)
-        return len(self.variables) - 1
+        try:
+            return self.variables[name]
+        except KeyError:
+            self.variables[name] = len(self.variables)
+            return len(self.variables) - 1
 
     def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)

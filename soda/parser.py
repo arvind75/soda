@@ -15,7 +15,7 @@ pg = ParserGenerator(
         "/",
         "%",
         "^",
-        ":",
+        ":=",
         "(",
         ")",
         "=",
@@ -66,7 +66,7 @@ def put_expression(s):
     return ast.PutStatement(s[1], package, line, col)
 
 
-@pg.production("statement : IDENTIFIER : expression END")
+@pg.production("statement : IDENTIFIER := expression END")
 def assignment(s):
     sourcepos = s[1].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
