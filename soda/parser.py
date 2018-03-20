@@ -27,6 +27,7 @@ pg = ParserGenerator(
         "&",
         "|",
         "!",
+        ",",
         "NEG",
         "END",
         "NUMBER",
@@ -66,15 +67,35 @@ def put_expression(s):
     return ast.PutStatement(s[1], package, line, col)
 
 
-@pg.production("statement : IDENTIFIER := expression END")
+@pg.production("statement : identifierlist := expressionlist END")
 def assignment(s):
     sourcepos = s[1].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
+    return ast.Assignment(s[0], s[2], package, line, col)
+
+
+@pg.production("expressionlist : expressionlist , expressionlist")
+def expressionlist_expressionlist(s):
+    return ast.ExpressionPair(s[0], s[2])
+
+
+@pg.production("expressionlist : expression")
+def expressionlist_expression(s):
+    return s[0]
+
+
+@pg.production("identifierlist : identifierlist , identifierlist")
+def identifierlist_identifierlist(s):
+    return ast.IdentifierPair(s[0], s[2])
+
+
+@pg.production("identifierlist : IDENTIFIER")
+def identifierlist_identifier(s):
     string = s[0].getstr()
     iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.Assignment(iden, s[2], package, line, col)
+    return ast.RegisterVariable(iden)
 
 
 @pg.production("expression : expression  +  expression")

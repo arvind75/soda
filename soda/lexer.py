@@ -2,7 +2,7 @@ from rply.token import Token, BaseBox, SourcePosition
 
 whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
-symbols = ":!=<>&|()+-*/%^\"#"
+symbols = ":,!=<>&|()+-*/%^\"#"
 numeric = "0123456789"
 insertend = ["number", "string", "identifier", ")"]
 reserved = ["put", "fetch"]
@@ -96,6 +96,15 @@ class Lexer(BaseBox):
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
+                elif source[i] == ",":
+                    self.lasttoken = ","
+                    yield Token(name=",", value=",",
+                                source_pos=SourcePosition(idx=self.idx,
+                                                          lineno=self.lineno,
+                                                          colno=self.colno))
+                    self.colno += 1
+                    i += 1
+                    continue
                 elif source[i] == "(":
                     self.lasttoken = "("
                     yield Token(name="(", value="(",

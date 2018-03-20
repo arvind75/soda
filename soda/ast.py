@@ -17,6 +17,35 @@ class StatementPair(Node):
         self.right.compile(compiler)
 
 
+class ExpressionPair(Node):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def compile(self, compiler):
+        self.left.compile(compiler)
+        self.right.compile(compiler)
+
+
+class IdentifierPair(Node):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+        self.package = ""
+        self.line = 0
+        self.col = 0
+
+    def compile(self, compiler):
+        self.left.package = self.package
+        self.left.line = self.line
+        self.left.col = self.col
+        self.right.package = self.package
+        self.right.line = self.line
+        self.right.col = self.col
+        self.right.compile(compiler)
+        self.left.compile(compiler)
+
+
 class Statement(Node):
     def __init__(self, expr):
         self.expr = expr
@@ -64,6 +93,19 @@ class Variable(Node):
                       self.package, self.line, self.col)
 
 
+class RegisterVariable(Node):
+    def __init__(self, value):
+        self.value = value
+        self.package = ""
+        self.line = 0
+        self.col = 0
+
+    def compile(self, compiler):
+        compiler.emit(bytecode.STORE_VAR,
+                      compiler.register_variable(self.value),
+                      self.package, self.line, self.col)
+
+
 class Assignment(Node):
     def __init__(self, idens, exprs, package, line, col):
         self.idens = idens
@@ -73,10 +115,11 @@ class Assignment(Node):
         self.col = col
 
     def compile(self, compiler):
+        self.idens.package = self.package
+        self.idens.line = self.line
+        self.idens.col = self.col
         self.exprs.compile(compiler)
-        compiler.emit(bytecode.STORE_VAR,
-                      compiler.register_variable(self.idens),
-                      self.package, self.line, self.col)
+        self.idens.compile(compiler)
 
 
 class BinOp(Node):
