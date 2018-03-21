@@ -19,7 +19,8 @@ AND = 18
 OR = 19
 NEG = 20
 NOT = 21
-PUT = 22
+RETURN = 22
+PUT = 23
 
 BINOP_CODE = {
     "+": ADD,
@@ -69,6 +70,7 @@ NAMES = {
     OR: "        OR",
     NEG: "       NEG",
     NOT: "       NOT",
+    RETURN: "    RETURN",
     PUT: "       PUT",
 }
 
@@ -79,6 +81,7 @@ class Compiler(object):
         self.positions = []
         self.constants = []
         self.variables = {}
+        self.functions = {}
 
     def register_constant(self, value):
         self.constants.append(value)
@@ -90,6 +93,9 @@ class Compiler(object):
         except KeyError:
             self.variables[name] = len(self.variables)
             return len(self.variables) - 1
+
+    def register_function(self, function):
+        self.functions[function.name] = self.register_constant(function)
 
     def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)

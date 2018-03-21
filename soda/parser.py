@@ -16,6 +16,7 @@ pg = ParserGenerator(
         "%",
         "^",
         ":=",
+        "::",
         "(",
         ")",
         "=",
@@ -33,6 +34,7 @@ pg = ParserGenerator(
         "NUMBER",
         "STRING",
         "IDENTIFIER",
+        "RETURN",
         "PUT"
     ],
     precedence=[
@@ -59,7 +61,7 @@ def statement_statement(s):
 
 
 @pg.production("statement : PUT expression END")
-def put_expression(s):
+def statement_put(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
@@ -67,13 +69,67 @@ def put_expression(s):
     return ast.PutStatement(s[1], package, line, col)
 
 
+@pg.production("statement : returnstatement")
+def statement_return(s):
+    return s[0]
+
+
+@pg.production("statement : function")
+def statement_function(s):
+    return s[0]
+
+
 @pg.production("statement : identifierlist := expressionlist END")
-def assignment(s):
+def statement_assignment(s):
     sourcepos = s[1].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.Assignment(s[0], s[2], package, line, col)
+
+
+# TODO: functions with no body, return only
+@pg.production("returnstatement : RETURN expression END")
+def returnstatement(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.ReturnStatement(s[1], package, line, col)
+
+
+@pg.production("function : IDENTIFIER :: statement returnstatement")
+def function_noarg(s):
+    sourcepos = s[1].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Function(s[0], [], s[2],
+                        s[3], package, line, col)
+
+
+@pg.production("function : IDENTIFIER paramlist :: statement returnstatement")
+def function_arg(s):
+    sourcepos = s[2].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Function(s[0], s[1].get(), s[2],
+                        s[3], package, line, col)
+
+
+@pg.production("paramlist : paramlist , IDENTIFIER")
+def paramlist_paramlist(s):
+    string = s[2].getstr()
+    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+    return s[0].append(iden)
+
+
+@pg.production("paramlist : IDENTIFIER")
+def paramlist_identifier(s):
+    string = s[0].getstr()
+    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+    return ast.List(iden)
 
 
 @pg.production("expressionlist : expressionlist , expressionlist")
@@ -167,13 +223,8 @@ def expression_iden(s):
     return ast.Variable(iden, package, line, col)
 
 
-@pg.production("expression : stringliteral")
+@pg.production("expression : STRING")
 def expression_stringliteral(s):
-    return s[0]
-
-
-@pg.production("stringliteral : STRING")
-def stringliteral_string(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
@@ -188,9 +239,7 @@ def error_handler(token):
     package = fetcher.packages[token.getsourcepos().idx]
     line = str(token.getsourcepos().lineno)
     col = str(token.getsourcepos().colno)
-    if token.value == "$end":
-        sodaError(package, line, col, "EOF error")
-    elif token.name == "ERROR":
+    if token.name == "ERROR":
         sodaError(package, line, col, token.value)
     else:
         msg = "unexpected \"%s\"" % token.value

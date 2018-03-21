@@ -192,3 +192,12 @@ class SodaInt(SodaObject):
     def str(self):
         s = self.value.str()
         return unicode(s).encode("utf-8")
+
+
+class SodaFunction(SodaObject):
+    def __init__(self, name, arity, package, line, col):
+        self.name = name
+        self.arity = arity
+        self.package = package
+        self.line = line
+        self.col = col

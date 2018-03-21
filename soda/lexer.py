@@ -5,7 +5,7 @@ newlines = "\n\r\v"
 symbols = ":,!=<>&|()+-*/%^\"#"
 numeric = "0123456789"
 insertend = ["number", "string", "identifier", ")"]
-reserved = ["put", "fetch"]
+reserved = ["put", "fetch", "return"]
 
 
 class Lexer(BaseBox):
@@ -79,6 +79,40 @@ class Lexer(BaseBox):
                         msg = (
                             "assignment operator and its operands must "
                             "be separated by whitespace")
+                        self.lasttoken = "error"
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
+                    try:
+                        if source[i + 1] == ":":
+                            if not (source[i + 2] in whitespace and
+                                    source[i - 1] in whitespace):
+                                msg = (
+                                    "function constructor and its operands"
+                                    " must be separated by whitespace")
+                                self.lasttoken = "error"
+                                yield Token(name="ERROR", value=msg,
+                                            source_pos=SourcePosition(
+                                                idx=self.idx,
+                                                lineno=self.lineno,
+                                                colno=self.colno))
+                                break
+                            yield Token(name="::", value="::",
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            self.lasttoken = "::"
+                            self.colno += 2
+                            i += 2
+                            continue
+                    except IndexError:
+                        msg = (
+                            "function constructor and its operands"
+                            " must be separated by whitespace")
                         self.lasttoken = "error"
                         yield Token(name="ERROR", value=msg,
                                     source_pos=SourcePosition(
@@ -774,6 +808,13 @@ class Lexer(BaseBox):
                     elif iden == "fetch":
                         self.lasttoken = "fetch"
                         yield Token(name="FETCH", value=iden,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                    elif iden == "return":
+                        self.lasttoken = "return"
+                        yield Token(name="RETURN", value=iden,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,

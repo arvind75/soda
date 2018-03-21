@@ -1,10 +1,23 @@
 from rply.token import BaseBox
 from soda import bytecode
-from soda.objects import SodaInt, SodaString
+from soda.objects import SodaInt, SodaString, SodaFunction
 
 
 class Node(BaseBox):
     pass
+
+
+class List(Node):
+    def __init__(self, item=None):
+        self.items = []
+        if item is not None:
+            self.items.append(item)
+
+    def append(self, item):
+        self.items.append(item)
+
+    def get(self):
+        return self.items
 
 
 class StatementPair(Node):
@@ -149,6 +162,41 @@ class UnOp(Node):
     def compile(self, compiler):
         self.operand.compile(compiler)
         compiler.emit(bytecode.UNOP_CODE[self.operator], 0,
+                      self.package, self.line, self.col)
+
+
+class Function(Node):
+    def __init__(self, name, params, body, returnstatement,
+                 package, line, col):
+        self.name = name
+        self.params = params
+        self.body = body
+        self.returnstatement = returnstatement
+        self.package = package
+        self.line = line
+        self.col = col
+        self.compiler = bytecode.Compiler()
+
+    def compile(self, compiler):
+        self.body.compile(self.compiler)
+        self.returnstatement.compile(self.compiler)
+        function = SodaFunction(name=self.name, arity=len(self.params),
+                                package=self.package, line=self.line,
+                                col=self.col)
+        compiler.register_function(function)
+        self.compiler.register_function(function)
+
+
+class ReturnStatement(Node):
+    def __init__(self, value, package, line, col):
+        self.value = value
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        self.value.compile(compiler)
+        compiler.emit(bytecode.RETURN, 0,
                       self.package, self.line, self.col)
 
 
