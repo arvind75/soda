@@ -9,12 +9,13 @@ class Node(BaseBox):
 
 
 class List(Node):
-    def __init__(self, item=None):
+    def __init__(self, item):
+        assert not isinstance(item, unicode)
         self.items = []
-        if item is not None:
-            self.items.append(item)
+        self.items.append(item)
 
     def append(self, item):
+        assert not isinstance(item, unicode)
         self.items.append(item)
 
     def get(self):
@@ -23,7 +24,9 @@ class List(Node):
 
 class String(Node):
     def __init__(self, value, package, line, col):
-        self.value = value
+        string = value.getstr()
+        iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+        self.value = iden
         self.package = package
         self.line = line
         self.col = col
@@ -49,7 +52,9 @@ class Integer(Node):
 
 class Variable(Node):
     def __init__(self, value, package, line, col):
-        self.value = value
+        string = value.getstr()
+        iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+        self.value = iden
         self.package = package
         self.line = line
         self.col = col
@@ -62,7 +67,9 @@ class Variable(Node):
 
 class RegisterVariable(Node):
     def __init__(self, value, package, line, col):
-        self.value = value
+        string = value.getstr()
+        iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+        self.value = iden
         self.package = package
         self.line = line
         self.col = col
@@ -123,7 +130,9 @@ class UnOp(Node):
 class Function(Node):
     def __init__(self, name, params, body, returnstatement,
                  package, line, col):
-        self.name = name
+        string = name.getstr()
+        iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+        self.name = iden
         self.params = []
         self.body = body
         self.returnstatement = returnstatement
@@ -140,8 +149,6 @@ class Function(Node):
         for statement in self.body.get():
             statement.compile(self.compiler)
         self.returnstatement.compile(self.compiler)
-        self.compiler.emit(bytecode.RETURN, 0,
-                           self.package, self.line, self.col)
         function = SodaFunction(name=self.name, arity=len(self.params),
                                 package=self.package, line=self.line,
                                 col=self.col)

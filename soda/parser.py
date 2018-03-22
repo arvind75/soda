@@ -1,4 +1,3 @@
-from rpython.rlib.runicode import str_decode_utf_8
 from rpython.rlib.rbigint import rbigint
 from rply import ParserGenerator
 from soda.errors import sodaError
@@ -50,7 +49,7 @@ pg = ParserGenerator(
 
 
 @pg.production("main : statementlist")
-def main_block(s):
+def main_statementlist(s):
     return s[0]
 
 
@@ -97,7 +96,7 @@ def returnstatement(s):
     return ast.ReturnStatement(s[0], "", "", "")
 
 
-@pg.production("function : IDENTIFIER = statementlist returnstatement")
+@pg.production("function : funcname = statementlist returnstatement")
 def function_noarg(s):
     sourcepos = s[1].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
@@ -107,7 +106,7 @@ def function_noarg(s):
                         s[3], package, line, col)
 
 
-@pg.production("function : IDENTIFIER paramlist = statementlist "
+@pg.production("function : funcname paramlist = statementlist "
                "returnstatement")
 def function_arg(s):
     sourcepos = s[2].getsourcepos()
@@ -116,6 +115,11 @@ def function_arg(s):
     col = str(sourcepos.colno)
     return ast.Function(s[0], s[1].get(), s[3],
                         s[4], package, line, col)
+
+
+@pg.production("funcname : IDENTIFIER")
+def funcname(s):
+    return s[0]
 
 
 @pg.production("paramlist : paramlist IDENTIFIER")
@@ -157,9 +161,7 @@ def identifier(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    string = s[0].getstr()
-    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.RegisterVariable(iden, package, line, col)
+    return ast.RegisterVariable(s[0], package, line, col)
 
 
 @pg.production("expression : expression  +  expression")
@@ -226,9 +228,7 @@ def expression_iden(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    string = s[0].getstr()
-    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.Variable(iden, package, line, col)
+    return ast.Variable(s[0], package, line, col)
 
 
 @pg.production("expression : STRING")
@@ -237,9 +237,7 @@ def expression_stringliteral(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    string = s[0].getstr()
-    string, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.String(string, package, line, col)
+    return ast.String(s[0], package, line, col)
 
 
 @pg.error

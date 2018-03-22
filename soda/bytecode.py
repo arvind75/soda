@@ -1,3 +1,5 @@
+from soda.errors import sodaError
+
 LOAD_CONST = 1
 LOAD_VAR = 2
 STORE_VAR = 3
@@ -95,7 +97,13 @@ class Compiler(object):
             return len(self.variables) - 1
 
     def register_function(self, function):
-        self.functions[function.name] = self.register_constant(function)
+        try:
+            self.functions[function.name]
+            sodaError(function.package, function.line, function.col,
+                      "redeclaration of function \"%s\"" % function.name.encode
+                      ("utf-8"))
+        except KeyError:
+            self.functions[function.name] = self.register_constant(function)
 
     def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)
