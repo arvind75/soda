@@ -31,7 +31,7 @@ BINOP_CODE = {
     "/": DIV,
     "%": MOD,
     "^": POW,
-    "=": EQ,
+    "==": EQ,
     "!=": NE,
     "<": LT,
     ">": GT,
@@ -127,5 +127,6 @@ class Bytecode(object):
 
 def compile_ast(ast_node):
     compiler = Compiler()
-    ast_node.compile(compiler)
+    for node in ast_node.get():
+        node.compile(compiler)
     return compiler.create_bytecode()

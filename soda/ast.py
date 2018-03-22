@@ -45,16 +45,10 @@ class IdentifierPair(Node):
         self.left = left
         self.right = right
         self.package = ""
-        self.line = 0
-        self.col = 0
+        self.line = ""
+        self.col = ""
 
     def compile(self, compiler):
-        self.left.package = self.package
-        self.left.line = self.line
-        self.left.col = self.col
-        self.right.package = self.package
-        self.right.line = self.line
-        self.right.col = self.col
         self.right.compile(compiler)
         self.left.compile(compiler)
 
@@ -110,8 +104,8 @@ class RegisterVariable(Node):
     def __init__(self, value):
         self.value = value
         self.package = ""
-        self.line = 0
-        self.col = 0
+        self.line = ""
+        self.col = ""
 
     def compile(self, compiler):
         compiler.emit(bytecode.STORE_VAR,
@@ -128,9 +122,6 @@ class Assignment(Node):
         self.col = col
 
     def compile(self, compiler):
-        self.idens.package = self.package
-        self.idens.line = self.line
-        self.idens.col = self.col
         self.exprs.compile(compiler)
         self.idens.compile(compiler)
 
@@ -178,8 +169,11 @@ class Function(Node):
         self.compiler = bytecode.Compiler()
 
     def compile(self, compiler):
-        self.body.compile(self.compiler)
+        for statement in self.body.get():
+            statement.compile(self.compiler)
         self.returnstatement.compile(self.compiler)
+        self.compiler.emit(bytecode.RETURN, 0,
+                           self.package, self.line, self.col)
         function = SodaFunction(name=self.name, arity=len(self.params),
                                 package=self.package, line=self.line,
                                 col=self.col)

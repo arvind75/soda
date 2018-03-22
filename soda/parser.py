@@ -16,10 +16,10 @@ pg = ParserGenerator(
         "%",
         "^",
         ":=",
-        "::",
+        "=",
         "(",
         ")",
-        "=",
+        "==",
         "!=",
         "<=",
         ">=",
@@ -34,13 +34,12 @@ pg = ParserGenerator(
         "NUMBER",
         "STRING",
         "IDENTIFIER",
-        "RETURN",
         "PUT"
     ],
     precedence=[
         ("left", ["|"]),
         ("left", ["&"]),
-        ("left", ["=", "!=", "<=", ">=", "<", ">"]),
+        ("left", ["==", "!=", "<=", ">=", "<", ">"]),
         ("left", ["+", "-", "++", "--"]),
         ("left", ["*", "/", "%"]),
         ("left", ["^"]),
@@ -50,14 +49,20 @@ pg = ParserGenerator(
 )
 
 
-@pg.production("main : statement")
+@pg.production("main : statementlist")
 def main_block(s):
     return s[0]
 
 
-@pg.production("statement : statement statement")
+@pg.production("statementlist : statementlist statement")
 def statement_statement(s):
-    return ast.StatementPair(s[0], s[1])
+    s[0].append(s[1])
+    return s[0]
+
+
+@pg.production("statementlist : statement")
+def statementlist_statement(s):
+    return ast.List(s[0])
 
 
 @pg.production("statement : PUT expression END")
@@ -67,11 +72,6 @@ def statement_put(s):
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.PutStatement(s[1], package, line, col)
-
-
-@pg.production("statement : returnstatement")
-def statement_return(s):
-    return s[0]
 
 
 @pg.production("statement : function")
@@ -89,16 +89,12 @@ def statement_assignment(s):
 
 
 # TODO: functions with no body, return only
-@pg.production("returnstatement : RETURN expression END")
+@pg.production("returnstatement : expression END")
 def returnstatement(s):
-    sourcepos = s[0].getsourcepos()
-    package = fetcher.packages[sourcepos.idx]
-    line = str(sourcepos.lineno)
-    col = str(sourcepos.colno)
-    return ast.ReturnStatement(s[1], package, line, col)
+    return ast.ReturnStatement(s[0], "", "", "")
 
 
-@pg.production("function : IDENTIFIER :: statement returnstatement")
+@pg.production("function : IDENTIFIER = statementlist returnstatement")
 def function_noarg(s):
     sourcepos = s[1].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
@@ -108,21 +104,23 @@ def function_noarg(s):
                         s[3], package, line, col)
 
 
-@pg.production("function : IDENTIFIER paramlist :: statement returnstatement")
+@pg.production("function : IDENTIFIER paramlist = statementlist "
+               "returnstatement")
 def function_arg(s):
     sourcepos = s[2].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[0], s[1].get(), s[2],
-                        s[3], package, line, col)
+    return ast.Function(s[0], s[1].get(), s[3],
+                        s[4], package, line, col)
 
 
-@pg.production("paramlist : paramlist , IDENTIFIER")
+@pg.production("paramlist : paramlist IDENTIFIER")
 def paramlist_paramlist(s):
-    string = s[2].getstr()
+    string = s[1].getstr()
     iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return s[0].append(iden)
+    s[0].append(iden)
+    return s[0]
 
 
 @pg.production("paramlist : IDENTIFIER")
@@ -162,7 +160,7 @@ def identifierlist_identifier(s):
 @pg.production("expression : expression  /  expression")
 @pg.production("expression : expression  %  expression")
 @pg.production("expression : expression  ^  expression")
-@pg.production("expression : expression  =  expression")
+@pg.production("expression : expression  ==  expression")
 @pg.production("expression : expression  !=  expression")
 @pg.production("expression : expression  <=  expression")
 @pg.production("expression : expression  >=  expression")
