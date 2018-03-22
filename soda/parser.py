@@ -120,17 +120,13 @@ def function_arg(s):
 
 @pg.production("paramlist : paramlist IDENTIFIER")
 def paramlist_paramlist(s):
-    string = s[1].getstr()
-    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    s[0].append(iden)
+    s[0].append(s[1])
     return s[0]
 
 
 @pg.production("paramlist : IDENTIFIER")
 def paramlist_identifier(s):
-    string = s[0].getstr()
-    iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.List(iden)
+    return ast.List(s[0])
 
 
 @pg.production("expressionlist : expressionlist , expression")
@@ -157,9 +153,13 @@ def identifierlist_identifier(s):
 
 @pg.production("identifier : IDENTIFIER")
 def identifier(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
     string = s[0].getstr()
     iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-    return ast.RegisterVariable(iden)
+    return ast.RegisterVariable(iden, package, line, col)
 
 
 @pg.production("expression : expression  +  expression")

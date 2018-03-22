@@ -1,3 +1,4 @@
+from rpython.rlib.runicode import str_decode_utf_8
 from rply.token import BaseBox
 from soda import bytecode
 from soda.objects import SodaInt, SodaString, SodaFunction
@@ -60,11 +61,11 @@ class Variable(Node):
 
 
 class RegisterVariable(Node):
-    def __init__(self, value):
+    def __init__(self, value, package, line, col):
         self.value = value
-        self.package = ""
-        self.line = ""
-        self.col = ""
+        self.package = package
+        self.line = line
+        self.col = col
 
     def compile(self, compiler):
         compiler.emit(bytecode.STORE_VAR,
@@ -123,13 +124,17 @@ class Function(Node):
     def __init__(self, name, params, body, returnstatement,
                  package, line, col):
         self.name = name
-        self.params = params
+        self.params = []
         self.body = body
         self.returnstatement = returnstatement
         self.package = package
         self.line = line
         self.col = col
         self.compiler = bytecode.Compiler()
+        for param in params:
+            string = param.getstr()
+            iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+            self.params.append(iden)
 
     def compile(self, compiler):
         for statement in self.body.get():
