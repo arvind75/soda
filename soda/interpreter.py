@@ -32,10 +32,6 @@ class Frame(object):
 def run(frame, bc):
     code = bc.code
     positions = bc.positions
-    last = -1
-    spackage = ""
-    sline = ""
-    scol = ""
     pc = 0
     posc = 0
     while pc < len(bc.code):
@@ -47,12 +43,6 @@ def run(frame, bc):
         col = positions[posc + 2]
         posc += 3
         pc += 2
-        if c != bytecode.STORE_VAR and last == bytecode.STORE_VAR:
-            if not frame.valuestack_pos == 0:
-                sodaError(spackage, sline, scol,
-                          "assignment statement requires "
-                          "number of variables to match number of "
-                          "expressions")
         if c == bytecode.LOAD_CONST:
             const = bc.constants[arg]
             frame.push(const)
@@ -63,17 +53,11 @@ def run(frame, bc):
             var = frame.variables[arg]
             frame.push(var)
         elif c == bytecode.STORE_VAR:
-            spackage = package
-            sline = line
-            scol = col
-            try:
-                value = frame.pop()
-                frame.variables[arg] = value
-            except Exception:
-                sodaError(spackage, sline, scol,
-                          "assignment statement requires "
-                          "number of variables to match number of "
-                          "expressions")
+            package = package
+            line = line
+            col = col
+            value = frame.pop()
+            frame.variables[arg] = value
         elif c == bytecode.NEG:
             operand = frame.pop()
             if not operand.isint():
@@ -368,12 +352,6 @@ def run(frame, bc):
             os.write(1, output)
         else:
             sodaError("test", "-1", "-1", "unrecognized bytecode %s" % c)
-        last = c
-    if not frame.valuestack_pos == 0:
-        sodaError(spackage, sline, scol,
-                  "assignment statement requires "
-                  "number of variables to match number of "
-                  "expressions")
 
 
 def interpret(bc):

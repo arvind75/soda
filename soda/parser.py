@@ -55,7 +55,7 @@ def main_block(s):
 
 
 @pg.production("statementlist : statementlist statement")
-def statement_statement(s):
+def statementlist_statementlist(s):
     s[0].append(s[1])
     return s[0]
 
@@ -85,6 +85,9 @@ def statement_assignment(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
+    if not len(s[0].get()) == len(s[2].get()):
+        sodaError(package, line, col, "assignment operator requires number "
+                  "of variables to match number of expressions")
     return ast.Assignment(s[0], s[2], package, line, col)
 
 
@@ -130,23 +133,30 @@ def paramlist_identifier(s):
     return ast.List(iden)
 
 
-@pg.production("expressionlist : expressionlist , expressionlist")
+@pg.production("expressionlist : expressionlist , expression")
 def expressionlist_expressionlist(s):
-    return ast.ExpressionPair(s[0], s[2])
+    s[0].append(s[2])
+    return s[0]
 
 
 @pg.production("expressionlist : expression")
 def expressionlist_expression(s):
+    return ast.List(s[0])
+
+
+@pg.production("identifierlist : identifierlist , identifier")
+def identifierlist_identifierlist(s):
+    s[0].append(s[2])
     return s[0]
 
 
-@pg.production("identifierlist : identifierlist , identifierlist")
-def identifierlist_identifierlist(s):
-    return ast.IdentifierPair(s[0], s[2])
-
-
-@pg.production("identifierlist : IDENTIFIER")
+@pg.production("identifierlist : identifier")
 def identifierlist_identifier(s):
+    return ast.List(s[0])
+
+
+@pg.production("identifier : IDENTIFIER")
+def identifier(s):
     string = s[0].getstr()
     iden, trash = str_decode_utf_8(string, len(string), "strict", True)
     return ast.RegisterVariable(iden)

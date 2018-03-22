@@ -20,47 +20,6 @@ class List(Node):
         return self.items
 
 
-class StatementPair(Node):
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def compile(self, compiler):
-        self.left.compile(compiler)
-        self.right.compile(compiler)
-
-
-class ExpressionPair(Node):
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def compile(self, compiler):
-        self.left.compile(compiler)
-        self.right.compile(compiler)
-
-
-class IdentifierPair(Node):
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-        self.package = ""
-        self.line = ""
-        self.col = ""
-
-    def compile(self, compiler):
-        self.right.compile(compiler)
-        self.left.compile(compiler)
-
-
-class Statement(Node):
-    def __init__(self, expr):
-        self.expr = expr
-
-    def compile(self, compiler):
-        self.expr.compile(compiler)
-
-
 class String(Node):
     def __init__(self, value, package, line, col):
         self.value = value
@@ -122,8 +81,12 @@ class Assignment(Node):
         self.col = col
 
     def compile(self, compiler):
-        self.exprs.compile(compiler)
-        self.idens.compile(compiler)
+        exprlist = self.exprs.get()
+        exprlist.reverse()
+        for expr in exprlist:
+            expr.compile(compiler)
+        for iden in self.idens.get():
+            iden.compile(compiler)
 
 
 class BinOp(Node):
