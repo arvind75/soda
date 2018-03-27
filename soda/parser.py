@@ -96,7 +96,6 @@ def statement_assignment(s):
     return ast.Assignment(s[0], s[2], package, line, col)
 
 
-# TODO: functions with no body, return only
 @pg.production("returnstatement : RETURN expression")
 def returnstatement(s):
     return ast.ReturnStatement(s[1], "", "", "")
@@ -109,6 +108,26 @@ def function_noarg(s):
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.Function(s[0], [], s[2],
+                        s[3], package, line, col)
+
+
+@pg.production("function : IDENTIFIER = returnstatement")
+def function_nostatement_noarg(s):
+    sourcepos = s[1].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Function(s[0], [], None,
+                        s[2], package, line, col)
+
+
+@pg.production("function : IDENTIFIER paramlist = returnstatement")
+def function_nostatement_arg(s):
+    sourcepos = s[2].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Function(s[0], s[1].get(), None,
                         s[3], package, line, col)
 
 

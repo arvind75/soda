@@ -144,8 +144,9 @@ class Function(Node):
             self.params.append(iden)
 
     def compile(self, compiler):
-        for statement in self.body.get():
-            statement.compile(self.compiler)
+        if self.body is not None:
+            for statement in self.body.get():
+                statement.compile(self.compiler)
         self.returnstatement.compile(self.compiler)
         function = SodaFunction(name=self.name, arity=len(self.params),
                                 package=self.package, line=self.line,

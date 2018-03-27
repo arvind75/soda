@@ -101,6 +101,7 @@ class Compiler(object):
             sodaError(function.package, function.line, function.col,
                       "redeclaration of function \"%s\"" % function.name.encode
                       ("utf-8"))
+            return 0
         except KeyError:
             self.register_constant(function)
             return self.register_variable(function.name)
