@@ -83,7 +83,6 @@ class Compiler(object):
         self.positions = []
         self.constants = []
         self.variables = {}
-        self.functions = {}
 
     def register_constant(self, value):
         self.constants.append(value)
@@ -98,12 +97,13 @@ class Compiler(object):
 
     def register_function(self, function):
         try:
-            self.functions[function.name]
+            self.variables[function.name]
             sodaError(function.package, function.line, function.col,
                       "redeclaration of function \"%s\"" % function.name.encode
                       ("utf-8"))
         except KeyError:
-            self.functions[function.name] = self.register_constant(function)
+            self.register_constant(function)
+            return self.register_variable(function.name)
 
     def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)

@@ -32,6 +32,7 @@ pg = ParserGenerator(
         "END",
         "NUMBER",
         "STRING",
+        "RETURN",
         "IDENTIFIER",
         "PUT"
     ],
@@ -73,8 +74,13 @@ def statement_put(s):
     return ast.PutStatement(s[1], package, line, col)
 
 
-@pg.production("statement : function")
+@pg.production("statement : function END")
 def statement_function(s):
+    return s[0]
+
+
+@pg.production("statement : expression END")
+def statement_expression(s):
     return s[0]
 
 
@@ -91,12 +97,12 @@ def statement_assignment(s):
 
 
 # TODO: functions with no body, return only
-@pg.production("returnstatement : expression END")
+@pg.production("returnstatement : RETURN expression")
 def returnstatement(s):
-    return ast.ReturnStatement(s[0], "", "", "")
+    return ast.ReturnStatement(s[1], "", "", "")
 
 
-@pg.production("function : funcname = statementlist returnstatement")
+@pg.production("function : IDENTIFIER = statementlist returnstatement")
 def function_noarg(s):
     sourcepos = s[1].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
@@ -106,7 +112,7 @@ def function_noarg(s):
                         s[3], package, line, col)
 
 
-@pg.production("function : funcname paramlist = statementlist "
+@pg.production("function : IDENTIFIER paramlist = statementlist "
                "returnstatement")
 def function_arg(s):
     sourcepos = s[2].getsourcepos()
@@ -115,11 +121,6 @@ def function_arg(s):
     col = str(sourcepos.colno)
     return ast.Function(s[0], s[1].get(), s[3],
                         s[4], package, line, col)
-
-
-@pg.production("funcname : IDENTIFIER")
-def funcname(s):
-    return s[0]
 
 
 @pg.production("paramlist : paramlist IDENTIFIER")

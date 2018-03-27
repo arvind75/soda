@@ -10,12 +10,10 @@ class Node(BaseBox):
 
 class List(Node):
     def __init__(self, item):
-        assert not isinstance(item, unicode)
         self.items = []
         self.items.append(item)
 
     def append(self, item):
-        assert not isinstance(item, unicode)
         self.items.append(item)
 
     def get(self):

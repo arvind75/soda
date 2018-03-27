@@ -356,5 +356,4 @@ def run(frame, bc):
 
 def interpret(bc):
     frame = Frame(bc)
-    run(frame, bc)
-    return 0
+    return run(frame, bc)
