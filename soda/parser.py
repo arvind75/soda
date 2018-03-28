@@ -32,6 +32,7 @@ pg = ParserGenerator(
         "END",
         "NUMBER",
         "STRING",
+        "FUNC",
         "RETURN",
         "IDENTIFIER",
         "PUT"
@@ -101,50 +102,51 @@ def returnstatement(s):
     return ast.ReturnStatement(s[1], "", "", "")
 
 
-@pg.production("function : IDENTIFIER = statementlist returnstatement")
+@pg.production("function : FUNC IDENTIFIER ( ) = statementlist "
+               "returnstatement")
 def function_noarg(s):
-    sourcepos = s[1].getsourcepos()
+    sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[0], [], s[2],
-                        s[3], package, line, col)
+    return ast.Function(s[1], [], s[5],
+                        s[6], package, line, col)
 
 
-@pg.production("function : IDENTIFIER = returnstatement")
+@pg.production("function : FUNC IDENTIFIER ( ) = returnstatement")
 def function_nostatement_noarg(s):
-    sourcepos = s[1].getsourcepos()
+    sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[0], [], None,
-                        s[2], package, line, col)
+    return ast.Function(s[1], [], None,
+                        s[5], package, line, col)
 
 
-@pg.production("function : IDENTIFIER paramlist = returnstatement")
+@pg.production("function : FUNC IDENTIFIER ( paramlist ) = returnstatement")
 def function_nostatement_arg(s):
-    sourcepos = s[2].getsourcepos()
+    sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[0], s[1].get(), None,
-                        s[3], package, line, col)
+    return ast.Function(s[1], s[3].get(), None,
+                        s[6], package, line, col)
 
 
-@pg.production("function : IDENTIFIER paramlist = statementlist "
+@pg.production("function : FUNC IDENTIFIER ( paramlist ) = statementlist "
                "returnstatement")
 def function_arg(s):
-    sourcepos = s[2].getsourcepos()
+    sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[0], s[1].get(), s[3],
-                        s[4], package, line, col)
+    return ast.Function(s[1], s[3].get(), s[6],
+                        s[7], package, line, col)
 
 
-@pg.production("paramlist : paramlist IDENTIFIER")
+@pg.production("paramlist : paramlist , IDENTIFIER")
 def paramlist_paramlist(s):
-    s[0].append(s[1])
+    s[0].append(s[2])
     return s[0]
 
 
@@ -244,6 +246,15 @@ def expression_number(s):
 
 @pg.production("expression : IDENTIFIER")
 def expression_iden(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Variable(s[0], package, line, col)
+
+
+@pg.production("expression : IDENTIFIER ( expressionlist )")
+def expression_call(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
