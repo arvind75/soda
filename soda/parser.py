@@ -259,7 +259,16 @@ def expression_call(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Variable(s[0], package, line, col)
+    return ast.Call(s[0], s[2].get(), package, line, col)
+
+
+@pg.production("expression : IDENTIFIER ( ) ")
+def expression_call_noargs(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Call(s[0], [], package, line, col)
 
 
 @pg.production("expression : STRING")

@@ -22,7 +22,8 @@ OR = 19
 NEG = 20
 NOT = 21
 RETURN = 22
-PUT = 23
+CALL = 23
+PUT = 24
 
 BINOP_CODE = {
     "+": ADD,
@@ -73,6 +74,7 @@ NAMES = {
     NEG: "       NEG",
     NOT: "       NOT",
     RETURN: "    RETURN",
+    CALL: "      CALL",
     PUT: "       PUT",
 }
 

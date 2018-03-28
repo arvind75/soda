@@ -347,6 +347,12 @@ def run(frame, bc):
                 operand = operand.tostr()
             result = operand.lnot()
             frame.push(result)
+        elif c == bytecode.RETURN:
+            result = frame.pop()
+            return result
+        elif c == bytecode.CALL:
+            # TODO put function calling here
+            pass
         elif c == bytecode.PUT:
             output = frame.pop().str()
             os.write(1, output)

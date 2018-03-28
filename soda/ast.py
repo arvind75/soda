@@ -155,6 +155,28 @@ class Function(Node):
         self.compiler.register_function(function)
 
 
+class Call(Node):
+    def __init__(self, name, exprlist, package, line, col):
+        string = name.getstr()
+        iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+        self.name = iden
+        self.exprlist = exprlist
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        for expr in self.exprlist:
+            expr.compile(compiler)
+        idx = compiler.functions.get(self.name, -1)
+        if not idx == -1:
+            function = compiler.constants[idx]
+            if not len(self.exprlist) == function.arity:
+                idx = -2
+        compiler.emit(bytecode.CALL, idx,
+                      self.package, self.line, self.col)
+
+
 class ReturnStatement(Node):
     def __init__(self, value, package, line, col):
         self.value = value
