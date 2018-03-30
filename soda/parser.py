@@ -109,7 +109,7 @@ def function_noarg(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[1], [], s[5],
+    return ast.Function(s[1], [], s[5].get(),
                         s[6], package, line, col)
 
 
@@ -119,7 +119,7 @@ def function_nostatement_noarg(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[1], [], None,
+    return ast.Function(s[1], [], [],
                         s[5], package, line, col)
 
 
@@ -129,7 +129,7 @@ def function_nostatement_arg(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[1], s[3].get(), None,
+    return ast.Function(s[1], s[3].get(), [],
                         s[6], package, line, col)
 
 
@@ -140,17 +140,17 @@ def function_arg(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[1], s[3].get(), s[6],
+    return ast.Function(s[1], s[3].get(), s[6].get(),
                         s[7], package, line, col)
 
 
-@pg.production("paramlist : paramlist , IDENTIFIER")
+@pg.production("paramlist : paramlist , identifier")
 def paramlist_paramlist(s):
     s[0].append(s[2])
     return s[0]
 
 
-@pg.production("paramlist : IDENTIFIER")
+@pg.production("paramlist : identifier")
 def paramlist_identifier(s):
     return ast.List(s[0])
 

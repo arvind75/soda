@@ -1,7 +1,7 @@
 from rpython.rlib.runicode import str_decode_utf_8
 from rply.token import BaseBox
 from soda import bytecode
-from soda.objects import SodaInt, SodaString, SodaFunction
+from soda.objects import SodaInt, SodaString, SodaFunction, SodaDummy
 
 
 class Node(BaseBox):
@@ -131,28 +131,30 @@ class Function(Node):
         string = name.getstr()
         iden, trash = str_decode_utf_8(string, len(string), "strict", True)
         self.name = iden
-        self.params = []
+        self.params = params
         self.body = body
         self.returnstatement = returnstatement
         self.package = package
         self.line = line
         self.col = col
         self.compiler = bytecode.Compiler()
-        for param in params:
-            string = param.getstr()
-            iden, trash = str_decode_utf_8(string, len(string), "strict", True)
-            self.params.append(iden)
 
     def compile(self, compiler):
-        if self.body is not None:
-            for statement in self.body.get():
-                statement.compile(self.compiler)
-        self.returnstatement.compile(self.compiler)
         function = SodaFunction(name=self.name, arity=len(self.params),
-                                package=self.package, line=self.line,
-                                col=self.col)
+                                compiler=self.compiler, package=self.package,
+                                line=self.line, col=self.col)
         compiler.register_function(function)
         self.compiler.register_function(function)
+        sd = SodaDummy()
+        for i in range(0, function.arity):
+            self.compiler.emit(bytecode.LOAD_CONST,
+                               self.compiler.register_constant(sd),
+                               self.package, self.line, self.col)
+        for param in self.params:
+            param.compile(self.compiler)
+        for statement in self.body:
+            statement.compile(self.compiler)
+        self.returnstatement.compile(self.compiler)
 
 
 class Call(Node):

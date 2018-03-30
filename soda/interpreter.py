@@ -351,8 +351,27 @@ def run(frame, bc):
             result = frame.pop()
             return result
         elif c == bytecode.CALL:
-            # TODO put function calling here
-            pass
+            if arg == -1:
+                sodaError(package, line, col,
+                          "cannot evaluate undeclared function")
+            elif arg == -2:
+                sodaError(package, line, col,
+                          "number of arguments passed to function "
+                          "must match number of expected parameters")
+            function = bc.constants[arg]
+            arglist = []
+            for i in range(0, function.arity):
+                value = frame.pop()
+                arglist.append(value)
+            function.evaluate_args(arglist)
+            fbc = function.compiler.create_bytecode()
+            try:
+                result = interpret(fbc)
+                frame.push(result)
+                function.revert_state()
+            except RuntimeError:
+                sodaError(package, line, col,
+                          "maximum recursion depth exceeded")
         elif c == bytecode.PUT:
             output = frame.pop().str()
             os.write(1, output)
@@ -362,4 +381,5 @@ def run(frame, bc):
 
 def interpret(bc):
     frame = Frame(bc)
-    return run(frame, bc)
+    result = run(frame, bc)
+    return result

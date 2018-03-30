@@ -7,6 +7,11 @@ class SodaObject(BaseBox):
     pass
 
 
+class SodaDummy(SodaObject):
+    def __init__(self):
+        pass
+
+
 class SodaString(SodaObject):
     def __init__(self, value):
         assert isinstance(value, unicode)
@@ -195,9 +200,22 @@ class SodaInt(SodaObject):
 
 
 class SodaFunction(SodaObject):
-    def __init__(self, name, arity, package, line, col):
+    def __init__(self, name, arity, compiler, package, line, col):
         self.name = name
         self.arity = arity
+        self.compiler = compiler
+        self.constbuffer = []
         self.package = package
         self.line = line
         self.col = col
+
+    def evaluate_args(self, argstack):
+        argstack.reverse()
+        for i in range(0, len(self.compiler.constants)):
+            self.constbuffer.append(self.compiler.constants[i])
+            if isinstance(self.compiler.constants[i], SodaDummy):
+                self.compiler.constants[i] = argstack.pop()
+
+    def revert_state(self):
+        self.compiler.constants = self.constbuffer
+        self.constbuffer = []
