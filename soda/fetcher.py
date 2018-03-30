@@ -1,4 +1,5 @@
 from rpython.rlib.streamio import open_file_as_stream
+from rply.token import Token, SourcePosition
 from rpython.rlib.rpath import rnormpath
 from soda.lexer import lexer
 from soda.errors import sodaError
@@ -55,6 +56,20 @@ class Fetcher(object):
                             else:
                                 i += 1
                                 fetchfound = True
+                        elif (token.name == "IDENTIFIER" and
+                              self.packages.index(package) != 0):
+                            modidx = token.source_pos.idx
+                            modlineno = token.source_pos.lineno
+                            modcolno = token.source_pos.colno
+                            modifiedtoken = Token(name=token.name,
+                                                  value=(package + "." +
+                                                         token.value),
+                                                  source_pos=SourcePosition(
+                                                      idx=modidx,
+                                                      lineno=modlineno,
+                                                      colno=modcolno))
+                            i += 1
+                            tokenlist.append(modifiedtoken)
                         else:
                             i += 1
                             tokenlist.append(token)
@@ -76,7 +91,7 @@ class Fetcher(object):
                                     "package names must be "
                                     "separated by newlines"
                                 )
-                        if token.name == "END":
+                        elif token.name == "END":
                             packagefound = False
                             continue
                         else:
