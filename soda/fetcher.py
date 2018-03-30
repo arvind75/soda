@@ -57,7 +57,8 @@ class Fetcher(object):
                                 i += 1
                                 fetchfound = True
                         elif (token.name == "IDENTIFIER" and
-                              self.packages.index(package) != 0):
+                              self.packages.index(package) != 0 and "." not in
+                              token.value):
                             modidx = token.source_pos.idx
                             modlineno = token.source_pos.lineno
                             modcolno = token.source_pos.colno

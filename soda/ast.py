@@ -144,7 +144,9 @@ class Function(Node):
                                 compiler=self.compiler, package=self.package,
                                 line=self.line, col=self.col)
         compiler.register_function(function)
-        self.compiler.register_function(function)
+        for constant in compiler.constants:
+            if isinstance(constant, SodaFunction):
+                self.compiler.register_function(constant)
         sd = SodaDummy()
         for i in range(0, function.arity):
             self.compiler.emit(bytecode.LOAD_CONST,
