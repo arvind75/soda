@@ -49,17 +49,23 @@ class Integer(Node):
 
 
 class Variable(Node):
-    def __init__(self, value, package, line, col):
+    def __init__(self, value, reference, package, line, col):
         string = value.getstr()
         iden, trash = str_decode_utf_8(string, len(string), "strict", True)
         self.value = iden
+        if reference is not None:
+            string = reference.getstr()
+            ref, trash = str_decode_utf_8(string, len(string), "strict", True)
+        else:
+            ref = package
+        self.reference = ref
         self.package = package
         self.line = line
         self.col = col
 
     def compile(self, compiler):
         compiler.emit(bytecode.LOAD_VAR,
-                      compiler.variables.get(self.value, -1),
+                      compiler.variables.get(self.value + self.reference, -1),
                       self.package, self.line, self.col)
 
 
@@ -74,7 +80,7 @@ class RegisterVariable(Node):
 
     def compile(self, compiler):
         compiler.emit(bytecode.STORE_VAR,
-                      compiler.register_variable(self.value),
+                      compiler.register_variable(self.value, self.package),
                       self.package, self.line, self.col)
 
 
@@ -160,10 +166,16 @@ class Function(Node):
 
 
 class Call(Node):
-    def __init__(self, name, exprlist, package, line, col):
+    def __init__(self, name, reference, exprlist, package, line, col):
         string = name.getstr()
         iden, trash = str_decode_utf_8(string, len(string), "strict", True)
         self.name = iden
+        if reference is not None:
+            string = reference.getstr()
+            ref, trash = str_decode_utf_8(string, len(string), "strict", True)
+        else:
+            ref = package
+        self.reference = ref
         self.exprlist = exprlist
         self.package = package
         self.line = line
@@ -172,7 +184,7 @@ class Call(Node):
     def compile(self, compiler):
         for expr in self.exprlist:
             expr.compile(compiler)
-        idx = compiler.functions.get(self.name, -1)
+        idx = compiler.functions.get(self.name + self.reference, -1)
         if not idx == -1:
             function = compiler.constants[idx]
             if not len(self.exprlist) == function.arity:

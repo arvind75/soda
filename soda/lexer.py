@@ -2,7 +2,7 @@ from rply.token import Token, BaseBox, SourcePosition
 
 whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
-symbols = ":,!=<>&|()+-*/%^\"#"
+symbols = ":.,!=<>&|()+-*/%^\"#"
 numeric = "0123456789"
 insertend = ["number", "string", "identifier", ")"]
 reserved = ["put", "fetch", "func", "return"]
@@ -86,40 +86,6 @@ class Lexer(BaseBox):
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
-                    try:
-                        if source[i + 1] == ":":
-                            if not (source[i + 2] in whitespace and
-                                    source[i - 1] in whitespace):
-                                msg = (
-                                    "function constructor and its operands"
-                                    " must be separated by whitespace")
-                                self.lasttoken = "error"
-                                yield Token(name="ERROR", value=msg,
-                                            source_pos=SourcePosition(
-                                                idx=self.idx,
-                                                lineno=self.lineno,
-                                                colno=self.colno))
-                                break
-                            yield Token(name="::", value="::",
-                                        source_pos=SourcePosition(
-                                            idx=self.idx,
-                                            lineno=self.lineno,
-                                            colno=self.colno))
-                            self.lasttoken = "::"
-                            self.colno += 2
-                            i += 2
-                            continue
-                    except IndexError:
-                        msg = (
-                            "function constructor and its operands"
-                            " must be separated by whitespace")
-                        self.lasttoken = "error"
-                        yield Token(name="ERROR", value=msg,
-                                    source_pos=SourcePosition(
-                                        idx=self.idx,
-                                        lineno=self.lineno,
-                                        colno=self.colno))
-                        break
                     else:
                         msg = (
                             "unexpected \":\"")
@@ -130,6 +96,35 @@ class Lexer(BaseBox):
                                         lineno=self.lineno,
                                         colno=self.colno))
                         break
+                elif source[i] == ".":
+                    try:
+                        if (source[i + 1] in whitespace and
+                                source[i - 1] in whitespace):
+                            msg = "disconnected \".\""
+                            self.lasttoken = "error"
+                            yield Token(name="ERROR", value=msg,
+                                        source_pos=SourcePosition(
+                                            idx=self.idx,
+                                            lineno=self.lineno,
+                                            colno=self.colno))
+                            break
+                    except IndexError:
+                        msg = "disconnected \".\""
+                        self.lasttoken = "error"
+                        yield Token(name="ERROR", value=msg,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                        break
+                    self.lasttoken = "."
+                    yield Token(name=".", value=".",
+                                source_pos=SourcePosition(idx=self.idx,
+                                                          lineno=self.lineno,
+                                                          colno=self.colno))
+                    self.colno += 1
+                    i += 1
+                    continue
                 elif source[i] == ",":
                     self.lasttoken = ","
                     yield Token(name=",", value=",",

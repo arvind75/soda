@@ -56,21 +56,6 @@ class Fetcher(object):
                             else:
                                 i += 1
                                 fetchfound = True
-                        elif (token.name == "IDENTIFIER" and
-                              self.packages.index(package) != 0 and "." not in
-                              token.value):
-                            modidx = token.source_pos.idx
-                            modlineno = token.source_pos.lineno
-                            modcolno = token.source_pos.colno
-                            modifiedtoken = Token(name=token.name,
-                                                  value=(package + "." +
-                                                         token.value),
-                                                  source_pos=SourcePosition(
-                                                      idx=modidx,
-                                                      lineno=modlineno,
-                                                      colno=modcolno))
-                            i += 1
-                            tokenlist.append(modifiedtoken)
                         else:
                             i += 1
                             tokenlist.append(token)

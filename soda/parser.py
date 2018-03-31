@@ -27,6 +27,7 @@ pg = ParserGenerator(
         "&",
         "|",
         "!",
+        ".",
         ",",
         "NEG",
         "END",
@@ -250,7 +251,16 @@ def expression_iden(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Variable(s[0], package, line, col)
+    return ast.Variable(s[0], None, package, line, col)
+
+
+@pg.production("expression : IDENTIFIER . IDENTIFIER")
+def expression_qualifiediden(s):
+    sourcepos = s[2].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Variable(s[2], s[0], package, line, col)
 
 
 @pg.production("expression : IDENTIFIER ( expressionlist )")
@@ -259,7 +269,16 @@ def expression_call(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Call(s[0], s[2].get(), package, line, col)
+    return ast.Call(s[0], None, s[2].get(), package, line, col)
+
+
+@pg.production("expression : IDENTIFIER . IDENTIFIER ( expressionlist )")
+def expression_qualifiedcall(s):
+    sourcepos = s[2].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Call(s[2], s[0], s[4].get(), package, line, col)
 
 
 @pg.production("expression : IDENTIFIER ( ) ")
@@ -269,6 +288,15 @@ def expression_call_noargs(s):
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.Call(s[0], [], package, line, col)
+
+
+@pg.production("expression : IDENTIFIER . IDENTIFIER ( ) ")
+def expression_qualifiedcall_noargs(s):
+    sourcepos = s[2].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Call(s[2], s[0], [], package, line, col)
 
 
 @pg.production("expression : STRING")
