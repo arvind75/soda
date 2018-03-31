@@ -92,6 +92,7 @@ class Compiler(object):
         return len(self.constants) - 1
 
     def register_variable(self, name, package):
+        package = unicode(package)
         try:
             return self.variables[name + package]
         except KeyError:
@@ -99,14 +100,15 @@ class Compiler(object):
             return len(self.variables) - 1
 
     def register_function(self, function):
+        package = unicode(function.package)
         try:
-            self.functions[function.name + function.package]
+            self.functions[function.name + package]
             sodaError(function.package, function.line, function.col,
                       "redeclaration of function \"%s\"" % function.name.encode
                       ("utf-8"))
         except KeyError:
             self.functions[function.name +
-                           function.package] = self.register_constant(function)
+                           package] = self.register_constant(function)
 
     def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)

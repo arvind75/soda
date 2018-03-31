@@ -1,5 +1,4 @@
 from rpython.rlib.streamio import open_file_as_stream
-from rply.token import Token, SourcePosition
 from rpython.rlib.rpath import rnormpath
 from soda.lexer import lexer
 from soda.errors import sodaError

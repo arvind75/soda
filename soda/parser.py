@@ -287,7 +287,7 @@ def expression_call_noargs(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Call(s[0], [], package, line, col)
+    return ast.Call(s[0], None, [], package, line, col)
 
 
 @pg.production("expression : IDENTIFIER . IDENTIFIER ( ) ")

@@ -57,7 +57,7 @@ class Variable(Node):
             string = reference.getstr()
             ref, trash = str_decode_utf_8(string, len(string), "strict", True)
         else:
-            ref = package
+            ref = unicode(package)
         self.reference = ref
         self.package = package
         self.line = line
@@ -174,7 +174,7 @@ class Call(Node):
             string = reference.getstr()
             ref, trash = str_decode_utf_8(string, len(string), "strict", True)
         else:
-            ref = package
+            ref = unicode(package)
         self.reference = ref
         self.exprlist = exprlist
         self.package = package
