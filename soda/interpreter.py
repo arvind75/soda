@@ -3,7 +3,8 @@ from soda.errors import sodaError
 from rpython.rlib import jit
 import os
 
-driver = jit.JitDriver(greens=["pc", "code", "bc"],
+driver = jit.JitDriver(greens=["pc", "posc", "code", "positions",
+                               "bc"],
                        reds=["frame"],
                        is_recursive=True)
 
@@ -35,7 +36,8 @@ def run(frame, bc):
     pc = 0
     posc = 0
     while pc < len(bc.code):
-        driver.jit_merge_point(pc=pc, code=code, bc=bc, frame=frame)
+        driver.jit_merge_point(pc=pc, posc=posc, code=code,
+                               positions=positions, bc=bc, frame=frame)
         c = code[pc]
         arg = code[pc + 1]
         package = positions[posc]
