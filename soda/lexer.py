@@ -98,7 +98,7 @@ class Lexer(BaseBox):
                         break
                 elif source[i] == ".":
                     try:
-                        if (source[i + 1] in whitespace and
+                        if (source[i + 1] in whitespace or
                                 source[i - 1] in whitespace):
                             msg = "disconnected \".\""
                             self.lasttoken = "error"
