@@ -35,8 +35,7 @@ pg = ParserGenerator(
         "STRING",
         "FUNC",
         "RETURN",
-        "IDENTIFIER",
-        "PUT"
+        "IDENTIFIER"
     ],
     precedence=[
         ("left", ["|"]),
@@ -65,15 +64,6 @@ def statementlist_statementlist(s):
 @pg.production("statementlist : statement")
 def statementlist_statement(s):
     return ast.List(s[0])
-
-
-@pg.production("statement : PUT expression END")
-def statement_put(s):
-    sourcepos = s[0].getsourcepos()
-    package = fetcher.packages[sourcepos.idx]
-    line = str(sourcepos.lineno)
-    col = str(sourcepos.colno)
-    return ast.PutStatement(s[1], package, line, col)
 
 
 @pg.production("statement : function END")

@@ -204,16 +204,3 @@ class ReturnStatement(Node):
         self.value.compile(compiler)
         compiler.emit(bytecode.RETURN, 0,
                       self.package, self.line, self.col)
-
-
-class PutStatement(Node):
-    def __init__(self, expr, package, line, col):
-        self.expr = expr
-        self.package = package
-        self.line = line
-        self.col = col
-
-    def compile(self, compiler):
-        self.expr.compile(compiler)
-        compiler.emit(bytecode.PUT, 0, self.package,
-                      self.line, self.col)

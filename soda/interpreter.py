@@ -361,22 +361,24 @@ def run(frame, bc):
                           "number of arguments passed to function "
                           "must match number of expected parameters")
             function = bc.constants[arg]
-            arglist = []
-            for i in range(0, function.arity):
-                value = frame.pop()
-                arglist.append(value)
-            function.evaluate_args(arglist)
-            fbc = function.compiler.create_bytecode()
-            try:
-                result = interpret(fbc)
-                frame.push(result)
-                function.revert_state()
-            except RuntimeError:
-                sodaError(package, line, col,
-                          "maximum recursion depth exceeded")
-        elif c == bytecode.PUT:
-            output = frame.pop().str()
-            os.write(1, output)
+            if unicode(function.name) == u"Print" and unicode(
+                    function.package) == u"io":
+                output = frame.pop().str()
+                os.write(1, output)
+            else:
+                arglist = []
+                for i in range(0, function.arity):
+                    value = frame.pop()
+                    arglist.append(value)
+                    function.evaluate_args(arglist)
+                    fbc = function.compiler.create_bytecode()
+                    try:
+                        result = interpret(fbc)
+                        frame.push(result)
+                        function.revert_state()
+                    except RuntimeError:
+                        sodaError(package, line, col,
+                                  "maximum recursion depth exceeded")
         else:
             sodaError("test", "-1", "-1", "unrecognized bytecode %s" % c)
 

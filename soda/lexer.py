@@ -5,7 +5,7 @@ newlines = "\n\r\v"
 symbols = ":.,!=<>&|()+-*/%^\"#"
 numeric = "0123456789"
 insertend = ["number", "string", "identifier", ")"]
-reserved = ["put", "fetch", "func", "return"]
+reserved = ["fetch", "func", "return"]
 
 
 class Lexer(BaseBox):
@@ -816,14 +816,7 @@ class Lexer(BaseBox):
                         break
                 iden = "".join(value)
                 if iden in reserved:
-                    if iden == "put":
-                        self.lasttoken = "put"
-                        yield Token(name="PUT", value=iden,
-                                    source_pos=SourcePosition(
-                                        idx=self.idx,
-                                        lineno=self.lineno,
-                                        colno=self.colno))
-                    elif iden == "fetch":
+                    if iden == "fetch":
                         self.lasttoken = "fetch"
                         yield Token(name="FETCH", value=iden,
                                     source_pos=SourcePosition(
