@@ -373,9 +373,9 @@ def run(frame, bc):
                     function.evaluate_args(arglist)
                     fbc = function.compiler.create_bytecode()
                     try:
+                        function.revert_state()
                         result = interpret(fbc)
                         frame.push(result)
-                        function.revert_state()
                     except RuntimeError:
                         sodaError(package, line, col,
                                   "maximum recursion depth exceeded")
