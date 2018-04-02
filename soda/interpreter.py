@@ -379,9 +379,11 @@ def run(frame, bc):
                     except RuntimeError:
                         sodaError(package, line, col,
                                   "maximum recursion depth exceeded")
-        elif c == bytecode.J_IF_FALSE:
-            if not frame.pop().str() == "true":
+        elif c == bytecode.J_IF_TRUE:
+            if not frame.pop().str() == "false":
                 pc = arg
+        elif c == bytecode.JUMP:
+            pc = arg
         else:
             sodaError("test", "-1", "-1", "unrecognized bytecode %s" % c)
 

@@ -59,8 +59,13 @@ class If(Node):
 
     def compile(self, compiler):
         self.cond.compile(compiler)
-        compiler.emit(bytecode.J_IF_FALSE, 0, self.package,
+        compiler.emit(bytecode.J_IF_TRUE, 0, self.package,
                       self.line, self.col)
+        jumppos = len(compiler.stack) - 1
+        self.elsestatement.compile(compiler)
+        compiler.emit(bytecode.JUMP, 0, self.package,
+                      self.line, self.col)
+        compiler.stack[jumppos] = len(compiler.stack)
         jumppos = len(compiler.stack) - 1
         for statement in self.body:
             statement.compile(compiler)

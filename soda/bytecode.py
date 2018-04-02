@@ -24,7 +24,7 @@ NOT = 21
 RETURN = 22
 CALL = 23
 JUMP = 24
-J_IF_FALSE = 25
+J_IF_TRUE = 25
 
 BINOP_CODE = {
     "+": ADD,
@@ -77,7 +77,7 @@ NAMES = {
     RETURN: "    RETURN",
     CALL: "      CALL",
     JUMP: "      JUMP",
-    J_IF_FALSE: "J_IF_FALSE",
+    J_IF_TRUE: " J_IF_TRUE",
 }
 
 

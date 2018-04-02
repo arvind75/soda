@@ -72,20 +72,20 @@ class SodaString(SodaObject):
 
     def land(self, other):
         assert isinstance(other, SodaString)
-        if (self.value == u"true" and other.value == u"true"):
+        if not (self.value == u"false" or other.value == u"false"):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
     def lor(self, other):
         assert isinstance(other, SodaString)
-        if (self.value == u"true" or other.value == u"true"):
+        if not (self.value == u"false" and other.value == u"false"):
             return SodaString(u"true")
         else:
             return SodaString(u"false")
 
     def lnot(self):
-        if self.value == u"true":
+        if not self.value == u"false":
             return SodaString(u"false")
         else:
             return SodaString(u"true")
