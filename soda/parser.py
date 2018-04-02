@@ -35,6 +35,9 @@ pg = ParserGenerator(
         "STRING",
         "FUNC",
         "RETURN",
+        "IF",
+        "THEN",
+        "ELSE",
         "IDENTIFIER"
     ],
     precedence=[
@@ -74,6 +77,16 @@ def statement_function(s):
 @pg.production("statement : expression END")
 def statement_expression(s):
     return s[0]
+
+
+@pg.production("statement : IF expression END THEN statementlist "
+               "ELSE statement")
+def statement_if(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.If(s[1], s[4].get(), s[6], package, line, col)
 
 
 @pg.production("statement : identifierlist := expressionlist END")

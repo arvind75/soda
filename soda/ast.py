@@ -48,6 +48,25 @@ class Integer(Node):
                       self.package, self.line, self.col)
 
 
+class If(Node):
+    def __init__(self, cond, body, elsestatement, package, line, col):
+        self.cond = cond
+        self.body = body
+        self.elsestatement = elsestatement
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        self.cond.compile(compiler)
+        compiler.emit(bytecode.J_IF_FALSE, 0, self.package,
+                      self.line, self.col)
+        jumppos = len(compiler.stack) - 1
+        for statement in self.body:
+            statement.compile(compiler)
+        compiler.stack[jumppos] = len(compiler.stack)
+
+
 class Variable(Node):
     def __init__(self, value, reference, package, line, col):
         string = value.getstr()
