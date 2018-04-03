@@ -382,8 +382,17 @@ def run(frame, bc):
         elif c == bytecode.J_IF_TRUE:
             if not frame.pop().str() == "false":
                 pc = arg
+        elif c == bytecode.J_IF_FALSE:
+            if frame.pop().str() == "false":
+                pc = arg
+                posc = arg - 1
         elif c == bytecode.JUMP:
+            oldpc = pc
             pc = arg
+            posc = arg - 1
+            if pc < oldpc:
+                driver.can_enter_jit(pc=pc, posc=posc, code=code,
+                                     positions=positions, bc=bc, frame=frame)
         else:
             sodaError("test", "-1", "-1", "unrecognized bytecode %s" % c)
 

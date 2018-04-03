@@ -29,6 +29,7 @@ pg = ParserGenerator(
         "!",
         ".",
         ",",
+        ";",
         "NEG",
         "END",
         "NUMBER",
@@ -38,6 +39,8 @@ pg = ParserGenerator(
         "IF",
         "THEN",
         "ELSE",
+        "FOR",
+        "ENDLOOP",
         "IDENTIFIER"
     ],
     precedence=[
@@ -87,6 +90,34 @@ def statement_if(s):
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.If(s[1], s[4].get(), s[6], package, line, col)
+
+
+@pg.production("statement : FOR smlstatement ; expression ; smlstatement END"
+               " statementlist ENDLOOP END")
+def statement_for(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.For(s[1], s[3], s[5], s[7].get(),
+                   package, line, col)
+
+
+@pg.production("smlstatement : expression")
+def smlstatement_expression(s):
+    return s[0]
+
+
+@pg.production("smlstatement : identifierlist := expressionlist")
+def smlstatement_assignment(s):
+    sourcepos = s[1].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    if not len(s[0].get()) == len(s[2].get()):
+        sodaError(package, line, col, "assignment operator requires number "
+                  "of variables to match number of expressions")
+    return ast.Assignment(s[0], s[2], package, line, col)
 
 
 @pg.production("statement : identifierlist := expressionlist END")

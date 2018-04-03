@@ -72,6 +72,31 @@ class If(Node):
         compiler.stack[jumppos] = len(compiler.stack)
 
 
+class For(Node):
+    def __init__(self, init, cond, post, body, package, line, col):
+        self.init = init
+        self.cond = cond
+        self.post = post
+        self.body = body
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        self.init.compile(compiler)
+        initpos = len(compiler.stack)
+        self.cond.compile(compiler)
+        compiler.emit(bytecode.J_IF_FALSE, 0, self.package,
+                      self.line, self.col)
+        postpos = len(compiler.stack) - 1
+        for statement in self.body:
+            statement.compile(compiler)
+        self.post.compile(compiler)
+        compiler.emit(bytecode.JUMP, initpos, self.package,
+                      self.line, self.col)
+        compiler.stack[postpos] = len(compiler.stack)
+
+
 class Variable(Node):
     def __init__(self, value, reference, package, line, col):
         string = value.getstr()

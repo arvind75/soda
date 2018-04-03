@@ -2,10 +2,11 @@ from rply.token import Token, BaseBox, SourcePosition
 
 whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
-symbols = ":.,!=<>&|()+-*/%^\"#"
+symbols = ":.,;!=<>&|()+-*/%^\"#"
 numeric = "0123456789"
-insertend = ["number", "string", "identifier", ")"]
-reserved = ["fetch", "func", "return", "if", "then", "else"]
+insertend = ["number", "string", "identifier", ")", "end"]
+reserved = ["fetch", "func", "return", "if",
+            "then", "else", "for", "end"]
 
 
 class Lexer(BaseBox):
@@ -128,6 +129,15 @@ class Lexer(BaseBox):
                 elif source[i] == ",":
                     self.lasttoken = ","
                     yield Token(name=",", value=",",
+                                source_pos=SourcePosition(idx=self.idx,
+                                                          lineno=self.lineno,
+                                                          colno=self.colno))
+                    self.colno += 1
+                    i += 1
+                    continue
+                elif source[i] == ";":
+                    self.lasttoken = ";"
+                    yield Token(name=";", value=";",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
@@ -854,6 +864,20 @@ class Lexer(BaseBox):
                     elif iden == "else":
                         self.lasttoken = "else"
                         yield Token(name="ELSE", value=iden,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                    elif iden == "for":
+                        self.lasttoken = "for"
+                        yield Token(name="FOR", value=iden,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                    elif iden == "end":
+                        self.lasttoken = "end"
+                        yield Token(name="ENDLOOP", value=iden,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
