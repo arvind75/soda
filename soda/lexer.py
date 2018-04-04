@@ -4,9 +4,10 @@ whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
 symbols = ":.,;!=<>&|()+-*/%^\"#"
 numeric = "0123456789"
-insertend = ["number", "string", "identifier", ")", "end"]
+insertend = ["number", "string", "identifier",
+             ")", "break", "end"]
 reserved = ["fetch", "func", "return", "if",
-            "then", "else", "for", "end"]
+            "then", "else", "for", "break", "end"]
 
 
 class Lexer(BaseBox):
@@ -878,6 +879,13 @@ class Lexer(BaseBox):
                     elif iden == "end":
                         self.lasttoken = "end"
                         yield Token(name="ENDLOOP", value=iden,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                    elif iden == "break":
+                        self.lasttoken = "break"
+                        yield Token(name="BREAK", value=iden,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,

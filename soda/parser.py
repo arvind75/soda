@@ -41,6 +41,7 @@ pg = ParserGenerator(
         "ELSE",
         "FOR",
         "ENDLOOP",
+        "BREAK",
         "IDENTIFIER"
     ],
     precedence=[
@@ -80,6 +81,15 @@ def statement_function(s):
 @pg.production("statement : expression END")
 def statement_expression(s):
     return s[0]
+
+
+@pg.production("statement : BREAK END")
+def statement_break(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Break(package, line, col)
 
 
 @pg.production("statement : IF expression END THEN statementlist "

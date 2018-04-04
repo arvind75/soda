@@ -86,8 +86,8 @@ NAMES = {
 class Compiler(object):
     def __init__(self):
         self.stack = []
-        self.positions = []
         self.constants = []
+        self.positions = []
         self.variables = {}
         self.functions = {}
 
@@ -117,9 +117,8 @@ class Compiler(object):
     def emit(self, code, arg=0, package="", line="-1", col="-1"):
         self.stack.append(code)
         self.stack.append(arg)
-        self.positions.append(package)
-        self.positions.append(line)
-        self.positions.append(col)
+        self.positions.append((package, line, col))
+        self.positions.append(("", "", ""))
 
     def create_bytecode(self):
         return Bytecode(self.stack, self.positions, self.constants[:],

@@ -95,6 +95,20 @@ class For(Node):
         compiler.emit(bytecode.JUMP, initpos, self.package,
                       self.line, self.col)
         compiler.stack[postpos] = len(compiler.stack)
+        for i in range(initpos, len(compiler.stack)):
+            if compiler.stack[i] == -3:
+                compiler.stack[i] = len(compiler.stack)
+
+
+class Break(Node):
+    def __init__(self, package, line, col):
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        compiler.emit(bytecode.JUMP, -3,
+                      self.package, self.line, self.col)
 
 
 class Variable(Node):

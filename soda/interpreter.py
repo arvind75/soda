@@ -3,47 +3,34 @@ from soda.errors import sodaError
 from rpython.rlib import jit
 import os
 
-driver = jit.JitDriver(greens=["pc", "posc", "code", "positions",
-                               "bc"],
+driver = jit.JitDriver(greens=["pc", "code", "positions", "bc"],
                        reds=["frame"],
                        is_recursive=True)
 
 
 class Frame(object):
     def __init__(self, bc):
-        self.valuestack = [None] * len(bc.code)
+        self.valuestack = []
         self.variables = [None] * bc.numvars
         self.valuestack_pos = 0
 
     def push(self, value):
-        pos = jit.hint(self.valuestack_pos, promote=True)
-        assert pos >= 0
-        self.valuestack[pos] = value
-        self.valuestack_pos = pos + 1
+        self.valuestack.append(value)
 
     def pop(self):
-        pos = jit.hint(self.valuestack_pos, promote=True)
-        new_pos = pos - 1
-        assert new_pos >= 0
-        value = self.valuestack[new_pos]
-        self.valuestack_pos = new_pos
-        return value
+        return self.valuestack.pop()
 
 
 def run(frame, bc):
     code = bc.code
     positions = bc.positions
     pc = 0
-    posc = 0
     while pc < len(bc.code):
-        driver.jit_merge_point(pc=pc, posc=posc, code=code,
-                               positions=positions, bc=bc, frame=frame)
+        driver.jit_merge_point(pc=pc, code=code, positions=positions,
+                               bc=bc, frame=frame)
         c = code[pc]
         arg = code[pc + 1]
-        package = positions[posc]
-        line = positions[posc + 1]
-        col = positions[posc + 2]
-        posc += 3
+        package, line, col = positions[pc]
         pc += 2
         if c == bytecode.LOAD_CONST:
             const = bc.constants[arg]
@@ -385,14 +372,15 @@ def run(frame, bc):
         elif c == bytecode.J_IF_FALSE:
             if frame.pop().str() == "false":
                 pc = arg
-                posc = arg - 1
         elif c == bytecode.JUMP:
+            if arg == -3:
+                sodaError(package, line, col,
+                          "break statement outside loop")
             oldpc = pc
             pc = arg
-            posc = arg - 1
             if pc < oldpc:
-                driver.can_enter_jit(pc=pc, posc=posc, code=code,
-                                     positions=positions, bc=bc, frame=frame)
+                driver.can_enter_jit(pc=pc, code=code, positions=positions,
+                                     bc=bc, frame=frame)
         else:
             sodaError("test", "-1", "-1", "unrecognized bytecode %s" % c)
 
