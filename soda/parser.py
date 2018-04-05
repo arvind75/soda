@@ -80,7 +80,7 @@ def statement_function(s):
 
 @pg.production("statement : expression END")
 def statement_expression(s):
-    return s[0]
+    return ast.Expression(s[0])
 
 
 @pg.production("statement : BREAK END")

@@ -32,7 +32,9 @@ def run(frame, bc):
         arg = code[pc + 1]
         package, line, col = positions[pc]
         pc += 2
-        if c == bytecode.LOAD_CONST:
+        if c == bytecode.DROP_CONST:
+            frame.pop()
+        elif c == bytecode.LOAD_CONST:
             const = bc.constants[arg]
             frame.push(const)
         elif c == bytecode.LOAD_VAR:
@@ -352,20 +354,23 @@ def run(frame, bc):
                     function.package) == u"io":
                 output = frame.pop().str()
                 os.write(1, output)
+                fbc = function.compiler.create_bytecode()
+                result = interpret(fbc)
+                frame.push(result)
             else:
                 arglist = []
                 for i in range(0, function.arity):
                     value = frame.pop()
                     arglist.append(value)
-                    function.evaluate_args(arglist)
-                    fbc = function.compiler.create_bytecode()
-                    try:
-                        function.revert_state()
-                        result = interpret(fbc)
-                        frame.push(result)
-                    except RuntimeError:
-                        sodaError(package, line, col,
-                                  "maximum recursion depth exceeded")
+                function.evaluate_args(arglist)
+                fbc = function.compiler.create_bytecode()
+                try:
+                    function.revert_state()
+                    result = interpret(fbc)
+                    frame.push(result)
+                except RuntimeError:
+                    sodaError(package, line, col,
+                              "maximum recursion depth exceeded")
         elif c == bytecode.J_IF_TRUE:
             if not frame.pop().str() == "false":
                 pc = arg

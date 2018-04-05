@@ -35,6 +35,16 @@ class String(Node):
                       self.package, self.line, self.col)
 
 
+class Expression(Node):
+    def __init__(self, value):
+        self.value = value
+
+    def compile(self, compiler):
+        self.value.compile(compiler)
+        compiler.emit(bytecode.DROP_CONST, 0,
+                      "", "", "")
+
+
 class Integer(Node):
     def __init__(self, value, package, line, col):
         self.value = value

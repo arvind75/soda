@@ -1,5 +1,5 @@
 from soda.errors import sodaError
-
+DROP_CONST = 0
 LOAD_CONST = 1
 LOAD_VAR = 2
 STORE_VAR = 3
@@ -54,6 +54,7 @@ UNOP_CODE = {
 # names for dumping bc to terminal
 # spacing is odd because rpython disallows conventional string formatting
 NAMES = {
+    DROP_CONST: "DROP_CONST",
     LOAD_CONST: "LOAD_CONST",
     LOAD_VAR: "  LOAD_VAR",
     STORE_VAR: " STORE_VAR",
