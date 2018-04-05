@@ -354,7 +354,8 @@ def run(frame, bc):
                     function.package) == u"io":
                 output = frame.pop().str()
                 os.write(1, output)
-                frame.push(0)
+                fbc = function.compiler.create_bytecode()
+                frame.push(interpret(fbc))
             else:
                 arglist = []
                 for i in range(0, function.arity):
