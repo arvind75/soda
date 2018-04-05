@@ -6,7 +6,7 @@ symbols = ":.,;!=<>&|()+-*/%^\"#"
 numeric = "0123456789"
 insertend = ["number", "string", "identifier",
              ")", "break", "end"]
-reserved = ["fetch", "func", "return", "if",
+reserved = ["fetch", "func", "where", "if",
             "then", "else", "for", "break", "end"]
 
 
@@ -841,9 +841,9 @@ class Lexer(BaseBox):
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
-                    elif iden == "return":
-                        self.lasttoken = "return"
-                        yield Token(name="RETURN", value=iden,
+                    elif iden == "where":
+                        self.lasttoken = "where"
+                        yield Token(name="WHERE", value=iden,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,

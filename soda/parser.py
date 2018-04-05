@@ -35,13 +35,13 @@ pg = ParserGenerator(
         "NUMBER",
         "STRING",
         "FUNC",
-        "RETURN",
         "IF",
         "THEN",
         "ELSE",
         "FOR",
         "ENDLOOP",
         "BREAK",
+        "WHERE",
         "IDENTIFIER"
     ],
     precedence=[
@@ -142,20 +142,20 @@ def statement_assignment(s):
     return ast.Assignment(s[0], s[2], package, line, col)
 
 
-@pg.production("returnstatement : RETURN expression")
+@pg.production("returnstatement : expression")
 def returnstatement(s):
-    return ast.ReturnStatement(s[1], "", "", "")
+    return ast.ReturnStatement(s[0], "", "", "")
 
 
-@pg.production("function : FUNC IDENTIFIER ( ) = statementlist "
-               "returnstatement")
+@pg.production("function : FUNC IDENTIFIER ( ) = returnstatement WHERE "
+               "statementlist ENDLOOP")
 def function_noarg(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[1], [], s[5].get(),
-                        s[6], package, line, col)
+    return ast.Function(s[1], [], s[7].get(),
+                        s[5], package, line, col)
 
 
 @pg.production("function : FUNC IDENTIFIER ( ) = returnstatement")
@@ -178,15 +178,15 @@ def function_nostatement_arg(s):
                         s[6], package, line, col)
 
 
-@pg.production("function : FUNC IDENTIFIER ( paramlist ) = statementlist "
-               "returnstatement")
+@pg.production("function : FUNC IDENTIFIER ( paramlist ) = returnstatement "
+               "WHERE statementlist ENDLOOP")
 def function_arg(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Function(s[1], s[3].get(), s[6].get(),
-                        s[7], package, line, col)
+    return ast.Function(s[1], s[3].get(), s[8].get(),
+                        s[6], package, line, col)
 
 
 @pg.production("paramlist : paramlist , identifier")
