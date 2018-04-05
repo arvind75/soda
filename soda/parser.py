@@ -113,6 +113,15 @@ def statement_for(s):
                    package, line, col)
 
 
+@pg.production("statement : FOR expression END statementlist ENDLOOP END")
+def statement_while(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.While(s[1], s[3].get(), package, line, col)
+
+
 @pg.production("smlstatement : expression")
 def smlstatement_expression(s):
     return s[0]

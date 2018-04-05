@@ -110,6 +110,30 @@ class For(Node):
                 compiler.stack[i] = len(compiler.stack)
 
 
+class While(Node):
+    def __init__(self, cond, body, package, line, col):
+        self.cond = cond
+        self.body = body
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        initpos = len(compiler.stack)
+        self.cond.compile(compiler)
+        compiler.emit(bytecode.J_IF_FALSE, 0, self.package,
+                      self.line, self.col)
+        postpos = len(compiler.stack) - 1
+        for statement in self.body:
+            statement.compile(compiler)
+        compiler.emit(bytecode.JUMP, initpos, self.package,
+                      self.line, self.col)
+        compiler.stack[postpos] = len(compiler.stack)
+        for i in range(initpos, len(compiler.stack)):
+            if compiler.stack[i] == -3:
+                compiler.stack[i] = len(compiler.stack)
+
+
 class Break(Node):
     def __init__(self, package, line, col):
         self.package = package
