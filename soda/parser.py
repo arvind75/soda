@@ -18,6 +18,8 @@ pg = ParserGenerator(
         "=",
         "(",
         ")",
+        "[",
+        "]",
         "==",
         "!=",
         "<=",
@@ -30,6 +32,7 @@ pg = ParserGenerator(
         ".",
         ",",
         ";",
+        ":",
         "NEG",
         "END",
         "NUMBER",
@@ -209,6 +212,26 @@ def paramlist_identifier(s):
     return ast.List(s[0])
 
 
+@pg.production("itemslist : itemslist , pair")
+def itemslist_itemslist(s):
+    for item in s[2].get():
+        s[0].append(item)
+    return s[0]
+
+
+@pg.production("itemslist : pair")
+def itemslist_pair(s):
+    return s[0]
+
+
+@pg.production("pair : expression : expression END")
+@pg.production("pair : expression : expression")
+def pair(s):
+    lst = ast.List(s[0])
+    lst.append(s[2])
+    return lst
+
+
 @pg.production("expressionlist : expressionlist , expression")
 def expressionlist_expressionlist(s):
     s[0].append(s[2])
@@ -280,24 +303,6 @@ def expression_paren(s):
     return s[1]
 
 
-@pg.production("expression : NUMBER")
-def expression_number(s):
-    sourcepos = s[0].getsourcepos()
-    package = fetcher.packages[sourcepos.idx]
-    line = str(sourcepos.lineno)
-    col = str(sourcepos.colno)
-    try:
-        a = rbigint()
-        return ast.Integer(a.fromstr(s[0].getstr()),
-                           package, line, col)
-    except Exception:
-        package = fetcher.packages[s[0].getsourcepos().idx]
-        line = str(s[0].getsourcepos().lineno)
-        col = str(s[0].getsourcepos().colno)
-        msg = "error in number %s" % s[0].getstr()
-        sodaError(package, line, col, msg)
-
-
 @pg.production("expression : IDENTIFIER")
 def expression_iden(s):
     sourcepos = s[0].getsourcepos()
@@ -352,6 +357,24 @@ def expression_qualifiedcall_noargs(s):
     return ast.Call(s[2], s[0], [], package, line, col)
 
 
+@pg.production("expression : NUMBER")
+def expression_number(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    try:
+        a = rbigint()
+        return ast.Integer(a.fromstr(s[0].getstr()),
+                           package, line, col)
+    except Exception:
+        package = fetcher.packages[s[0].getsourcepos().idx]
+        line = str(s[0].getsourcepos().lineno)
+        col = str(s[0].getsourcepos().colno)
+        msg = "error in number %s" % s[0].getstr()
+        sodaError(package, line, col, msg)
+
+
 @pg.production("expression : STRING")
 def expression_stringliteral(s):
     sourcepos = s[0].getsourcepos()
@@ -359,6 +382,40 @@ def expression_stringliteral(s):
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.String(s[0], package, line, col)
+
+
+@pg.production("expression : [ ]")
+def expression_emptyarray(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Array([], package, line, col)
+
+
+@pg.production("expression : [ itemslist ]")
+def expression_array(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Array(s[1].get(), package, line, col)
+
+
+@pg.production("expression : [ expressionlist ]")
+def expression_normalizedarray(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    lst = s[1].get()
+    enumlist = []
+    a = rbigint()
+    for i in range(0, len(lst)):
+        enumlist.append(ast.Integer(a.fromint(i),
+                                    package, line, col))
+        enumlist.append(lst[i])
+    return ast.Array(enumlist, package, line, col)
 
 
 @pg.error

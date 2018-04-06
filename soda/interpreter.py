@@ -1,4 +1,5 @@
 from soda import bytecode
+from soda.objects import SodaArray
 from soda.errors import sodaError
 from rpython.rlib import jit
 import os
@@ -49,6 +50,15 @@ def run(frame, bc):
             col = col
             value = frame.pop()
             frame.variables[arg] = value
+        elif c == bytecode.STOR_ARRAY:
+            package = package
+            line = line
+            col = col
+            items = []
+            for i in range(0, arg):
+                items.append(frame.pop())
+            sa = SodaArray(items)
+            frame.push(sa)
         elif c == bytecode.NEG:
             operand = frame.pop()
             if not operand.isint():

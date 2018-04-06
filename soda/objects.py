@@ -199,6 +199,25 @@ class SodaInt(SodaObject):
         return unicode(s).encode("utf-8")
 
 
+class SodaArray(SodaObject):
+    def __init__(self, itemlist):
+        itemlist.reverse()
+        self.values = {}
+        i = 0
+        while i < len(itemlist):
+            self.values[itemlist[i]] = itemlist[i + 1]
+            i += 2
+
+    def str(self):
+        s = []
+        for key in self.values:
+            val = self.values[key]
+            s.append("\"" + key.str() + "\" : "
+                     "\"" + val.str() + "\"")
+        return unicode("[" + ", ".join(s) +
+                       "]").encode("utf-8")
+
+
 class SodaFunction(SodaObject):
     def __init__(self, name, arity, compiler, package, line, col):
         self.name = name

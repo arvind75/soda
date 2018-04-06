@@ -58,6 +58,20 @@ class Integer(Node):
                       self.package, self.line, self.col)
 
 
+class Array(Node):
+    def __init__(self, items, package, line, col):
+        self.itemlist = items
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        for item in self.itemlist:
+            item.compile(compiler)
+        compiler.emit(bytecode.STOR_ARRAY, len(self.itemlist),
+                      self.package, self.line, self.col)
+
+
 class If(Node):
     def __init__(self, cond, body, elsestatement, package, line, col):
         self.cond = cond

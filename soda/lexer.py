@@ -2,10 +2,10 @@ from rply.token import Token, BaseBox, SourcePosition
 
 whitespace = " \n\r\v\t"
 newlines = "\n\r\v"
-symbols = ":.,;!=<>&|()+-*/%^\"#"
+symbols = ":.,;!=<>&|()[]+-*/%^\"#"
 numeric = "0123456789"
 insertend = ["number", "string", "identifier",
-             ")", "break", "end"]
+             ")", "]", "break", "end"]
 reserved = ["fetch", "func", "where", "if",
             "then", "else", "for", "break", "end"]
 
@@ -89,15 +89,15 @@ class Lexer(BaseBox):
                                         colno=self.colno))
                         break
                     else:
-                        msg = (
-                            "unexpected \":\"")
-                        self.lasttoken = "error"
-                        yield Token(name="ERROR", value=msg,
+                        self.lasttoken = ":"
+                        yield Token(name=":", value=":",
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,
                                         colno=self.colno))
-                        break
+                        self.colno += 1
+                        i += 1
+                        continue
                 elif source[i] == ".":
                     try:
                         if (source[i + 1] in whitespace or
@@ -157,6 +157,24 @@ class Lexer(BaseBox):
                 elif source[i] == ")":
                     self.lasttoken = ")"
                     yield Token(name=")", value=")",
+                                source_pos=SourcePosition(idx=self.idx,
+                                                          lineno=self.lineno,
+                                                          colno=self.colno))
+                    self.colno += 1
+                    i += 1
+                    continue
+                elif source[i] == "[":
+                    self.lasttoken = "["
+                    yield Token(name="[", value="[",
+                                source_pos=SourcePosition(idx=self.idx,
+                                                          lineno=self.lineno,
+                                                          colno=self.colno))
+                    self.colno += 1
+                    i += 1
+                    continue
+                elif source[i] == "]":
+                    self.lasttoken = "]"
+                    yield Token(name="]", value="]",
                                 source_pos=SourcePosition(idx=self.idx,
                                                           lineno=self.lineno,
                                                           colno=self.colno))
