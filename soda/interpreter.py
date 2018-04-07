@@ -66,7 +66,7 @@ def run(frame, bc):
                     operand = operand.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot negate non-integer string")
+                              "cannot negate non-integer type")
             result = operand.neg()
             frame.push(result)
         elif c == bytecode.ADD:
@@ -77,31 +77,49 @@ def run(frame, bc):
                     right = right.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot add non-integer strings")
+                              "cannot add non-integer types")
             if not left.isint():
                 try:
                     left = left.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot add non-integer strings")
+                              "cannot add non-integer types")
             result = right.add(left)
             frame.push(result)
         elif c == bytecode.CONCAT:
             right = frame.pop()
             left = frame.pop()
             if not left.isstr():
-                left = left.tostr()
+                try:
+                    left = left.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot concatenate non-string types")
             if not right.isstr():
-                right = right.tostr()
+                try:
+                    right = right.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot concatenate non-string types")
             result = right.concat(left)
             frame.push(result)
         elif c == bytecode.DIFF:
             right = frame.pop()
             left = frame.pop()
             if not left.isstr():
-                left = left.tostr()
+                try:
+                    left = left.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot find string difference of non-string"
+                              " types")
             if not right.isstr():
-                right = right.tostr()
+                try:
+                    right = right.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot find string difference of non-string"
+                              " types")
             result = right.diff(left)
             frame.push(result)
         elif c == bytecode.SUB:
@@ -112,13 +130,13 @@ def run(frame, bc):
                     right = right.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot subtract non-integer strings")
+                              "cannot subtract non-integer types")
             if not left.isint():
                 try:
                     left = left.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot subtract non-integer strings")
+                              "cannot subtract non-integer types")
             result = right.sub(left)
             frame.push(result)
         elif c == bytecode.MUL:
@@ -129,13 +147,13 @@ def run(frame, bc):
                     right = right.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot multiply non-integer strings")
+                              "cannot multiply non-integer types")
             if not left.isint():
                 try:
                     left = left.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot multiply non-integer strings")
+                              "cannot multiply non-integer types")
             result = right.mul(left)
             frame.push(result)
         elif c == bytecode.DIV:
@@ -146,13 +164,13 @@ def run(frame, bc):
                     right = right.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot divide non-integer strings")
+                              "cannot divide non-integer types")
             if not left.isint():
                 try:
                     left = left.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot divide non-integer strings")
+                              "cannot divide non-integer types")
             try:
                 result = right.div(left)
             except ZeroDivisionError:
@@ -168,13 +186,13 @@ def run(frame, bc):
                     right = right.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot modulo non-integer strings")
+                              "cannot modulo non-integer types")
             if not left.isint():
                 try:
                     left = left.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot modulo non-integer strings")
+                              "cannot modulo non-integer types")
             try:
                 result = right.mod(left)
             except ZeroDivisionError:
@@ -190,13 +208,13 @@ def run(frame, bc):
                     right = right.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot exponentiate non-integer strings")
+                              "cannot exponentiate non-integer types")
             if not left.isint():
                 try:
                     left = left.toint()
                 except Exception:
                     sodaError(package, line, col,
-                              "cannot exponentiate non-integer strings")
+                              "cannot exponentiate non-integer types")
             try:
                 result = right.pow(left)
             except ValueError:
@@ -219,11 +237,15 @@ def run(frame, bc):
                 frame.push(result)
                 continue
             except Exception:
-                right = right.tostr()
-                left = left.tostr()
-                result = right.eq(left)
-                frame.push(result)
-                continue
+                try:
+                    right = right.tostr()
+                    left = left.tostr()
+                    result = right.eq(left)
+                    frame.push(result)
+                    continue
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
         elif c == bytecode.NE:
             right = frame.pop()
             left = frame.pop()
@@ -239,11 +261,15 @@ def run(frame, bc):
                 frame.push(result)
                 continue
             except Exception:
-                right = right.tostr()
-                left = left.tostr()
-                result = right.ne(left)
-                frame.push(result)
-                continue
+                try:
+                    right = right.tostr()
+                    left = left.tostr()
+                    result = right.ne(left)
+                    frame.push(result)
+                    continue
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
         elif c == bytecode.GT:
             right = frame.pop()
             left = frame.pop()
@@ -259,11 +285,15 @@ def run(frame, bc):
                 frame.push(result)
                 continue
             except Exception:
-                right = right.tostr()
-                left = left.tostr()
-                result = right.gt(left)
-                frame.push(result)
-                continue
+                try:
+                    right = right.tostr()
+                    left = left.tostr()
+                    result = right.gt(left)
+                    frame.push(result)
+                    continue
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
         elif c == bytecode.LT:
             right = frame.pop()
             left = frame.pop()
@@ -279,11 +309,15 @@ def run(frame, bc):
                 frame.push(result)
                 continue
             except Exception:
-                right = right.tostr()
-                left = left.tostr()
-                result = right.lt(left)
-                frame.push(result)
-                continue
+                try:
+                    right = right.tostr()
+                    left = left.tostr()
+                    result = right.lt(left)
+                    frame.push(result)
+                    continue
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
         elif c == bytecode.GE:
             right = frame.pop()
             left = frame.pop()
@@ -299,11 +333,15 @@ def run(frame, bc):
                 frame.push(result)
                 continue
             except Exception:
-                right = right.tostr()
-                left = left.tostr()
-                result = right.ge(left)
-                frame.push(result)
-                continue
+                try:
+                    right = right.tostr()
+                    left = left.tostr()
+                    result = right.ge(left)
+                    frame.push(result)
+                    continue
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
         elif c == bytecode.LE:
             right = frame.pop()
             left = frame.pop()
@@ -319,33 +357,57 @@ def run(frame, bc):
                 frame.push(result)
                 continue
             except Exception:
-                right = right.tostr()
-                left = left.tostr()
-                result = right.le(left)
-                frame.push(result)
-                continue
+                try:
+                    right = right.tostr()
+                    left = left.tostr()
+                    result = right.le(left)
+                    frame.push(result)
+                    continue
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
         elif c == bytecode.AND:
             right = frame.pop()
             left = frame.pop()
             if not left.isstr():
-                left = left.tostr()
+                try:
+                    left = left.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
             if not right.isstr():
-                right = right.tostr()
+                try:
+                    right = right.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
             result = right.land(left)
             frame.push(result)
         elif c == bytecode.OR:
             right = frame.pop()
             left = frame.pop()
             if not left.isstr():
-                left = left.tostr()
+                try:
+                    left = left.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
             if not right.isstr():
-                right = right.tostr()
+                try:
+                    right = right.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
             result = right.lor(left)
             frame.push(result)
         elif c == bytecode.NOT:
             operand = frame.pop()
             if not operand.isstr():
-                operand = operand.tostr()
+                try:
+                    operand = operand.tostr()
+                except Exception:
+                    sodaError(package, line, col,
+                              "cannot compare arrays")
             result = operand.lnot()
             frame.push(result)
         elif c == bytecode.RETURN:

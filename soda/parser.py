@@ -399,7 +399,7 @@ def expression_array(s):
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
-    return ast.Array(s[1].get(), package, line, col)
+    return ast.Array(s[1].reverse(), package, line, col)
 
 
 @pg.production("expression : [ expressionlist ]")
@@ -415,6 +415,7 @@ def expression_normalizedarray(s):
         enumlist.append(ast.Integer(a.fromint(i),
                                     package, line, col))
         enumlist.append(lst[i])
+    enumlist.reverse()
     return ast.Array(enumlist, package, line, col)
 
 

@@ -19,6 +19,10 @@ class List(Node):
     def get(self):
         return self.items
 
+    def reverse(self):
+        self.items.reverse()
+        return self.items
+
 
 class String(Node):
     def __init__(self, value, package, line, col):

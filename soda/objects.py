@@ -201,12 +201,23 @@ class SodaInt(SodaObject):
 
 class SodaArray(SodaObject):
     def __init__(self, itemlist):
-        itemlist.reverse()
         self.values = {}
         i = 0
         while i < len(itemlist):
             self.values[itemlist[i]] = itemlist[i + 1]
             i += 2
+
+    def isstr(self):
+        return False
+
+    def isint(self):
+        return False
+
+    def toint(self):
+        raise Exception
+
+    def tostr(self):
+        raise Exception
 
     def str(self):
         s = []
