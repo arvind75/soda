@@ -101,8 +101,8 @@ def run(frame, bc):
                 except Exception:
                     sodaError(package, line, col,
                               "cannot concatenate non-string types")
-            right.concat(left)
-            frame.push(right)
+            result = right.concat(left)
+            frame.push(result)
         elif c == bytecode.DIFF:
             right = frame.pop()
             left = frame.pop()
@@ -120,8 +120,8 @@ def run(frame, bc):
                     sodaError(package, line, col,
                               "cannot find string difference of non-string"
                               " types")
-            right.diff(left)
-            frame.push(right)
+            result = right.diff(left)
+            frame.push(result)
         elif c == bytecode.SUB:
             right = frame.pop()
             left = frame.pop()

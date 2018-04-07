@@ -19,11 +19,11 @@ class SodaString(SodaObject):
 
     def concat(self, other):
         assert isinstance(other, SodaString)
-        self.value += other.value
+        return SodaString(self.value + other.value)
 
     def diff(self, other):
         assert isinstance(other, SodaString)
-        self.value = replace(self.value, other.value, u"")
+        return SodaString(replace(self.value, other.value, u""))
 
     def getval(self, idx):
         if idx.toint().integer() > len(self.value) - 1:
