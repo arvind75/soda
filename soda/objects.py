@@ -1,5 +1,5 @@
 from rply.token import BaseBox
-from rpython.rlib.rstring import UnicodeBuilder, replace
+from rpython.rlib.rstring import replace
 from rpython.rlib.rbigint import rbigint
 
 
@@ -19,14 +19,22 @@ class SodaString(SodaObject):
 
     def concat(self, other):
         assert isinstance(other, SodaString)
-        ustring = UnicodeBuilder()
-        ustring.append(self.value)
-        ustring.append(other.value)
-        return SodaString(ustring.build())
+        self.value += other.value
 
     def diff(self, other):
         assert isinstance(other, SodaString)
-        return SodaString(replace(self.value, other.value, u""))
+        self.value = replace(self.value, other.value, u"")
+
+    def getval(self, idx):
+        if idx.toint().integer() > len(self.value) - 1:
+            raise IndexError
+        val = self.value[idx.toint().integer()]
+        return SodaString(val)
+
+    """
+    def setval(self, idx, value):
+        self.value[idx.integer()] = unicode(value.str())
+    """
 
     def eq(self, other):
         assert isinstance(other, SodaString)
@@ -94,6 +102,9 @@ class SodaString(SodaObject):
         return True
 
     def isint(self):
+        return False
+
+    def isarray(self):
         return False
 
     def toint(self):
@@ -188,8 +199,14 @@ class SodaInt(SodaObject):
     def isint(self):
         return True
 
+    def isarray(self):
+        return False
+
     def toint(self):
         return SodaInt(self.value)
+
+    def integer(self):
+        return self.value.toint()
 
     def tostr(self):
         return SodaString(self.str().decode("utf-8"))
@@ -201,17 +218,31 @@ class SodaInt(SodaObject):
 
 class SodaArray(SodaObject):
     def __init__(self, itemlist):
-        self.values = {}
+        self.value = {}
         i = 0
         while i < len(itemlist):
-            self.values[itemlist[i].str()] = itemlist[i + 1].str()
+            self.value[itemlist[i].str()] = itemlist[i + 1]
             i += 2
+
+    def getval(self, idx):
+        try:
+            return self.value[idx.str()]
+        except KeyError:
+            return SodaString(u"")
+
+    """
+    def setval(self, idx, value):
+        self.value[idx.str()] = value
+    """
 
     def isstr(self):
         return False
 
     def isint(self):
         return False
+
+    def isarray(self):
+        return True
 
     def toint(self):
         raise Exception
@@ -221,10 +252,10 @@ class SodaArray(SodaObject):
 
     def str(self):
         s = []
-        for key in self.values:
-            val = self.values[key]
+        for key in self.value:
+            val = self.value[key]
             s.append("\"" + key + "\" : "
-                     "\"" + val + "\"")
+                     "\"" + val.str() + "\"")
         return unicode("[" + ", ".join(s) +
                        "]").encode("utf-8")
 

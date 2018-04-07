@@ -184,6 +184,38 @@ class Variable(Node):
                       self.package, self.line, self.col)
 
 
+class SetIndex(Node):
+    def __init__(self, var, newval, idx, package, line, col):
+        self.var = var
+        self.newval = newval
+        self.idx = idx
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        self.var.compile(compiler)
+        self.newval.compile(compiler)
+        self.idx.compile(compiler)
+        compiler.emit(bytecode.SET_INDEX, 0,
+                      self.package, self.line, self.col)
+
+
+class GetIndex(Node):
+    def __init__(self, var, idx, package, line, col):
+        self.var = var
+        self.idx = idx
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        self.var.compile(compiler)
+        self.idx.compile(compiler)
+        compiler.emit(bytecode.GET_INDEX, 0,
+                      self.package, self.line, self.col)
+
+
 class RegisterVariable(Node):
     def __init__(self, value, package, line, col):
         string = value.getstr()

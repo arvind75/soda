@@ -101,8 +101,8 @@ def run(frame, bc):
                 except Exception:
                     sodaError(package, line, col,
                               "cannot concatenate non-string types")
-            result = right.concat(left)
-            frame.push(result)
+            right.concat(left)
+            frame.push(right)
         elif c == bytecode.DIFF:
             right = frame.pop()
             left = frame.pop()
@@ -120,8 +120,8 @@ def run(frame, bc):
                     sodaError(package, line, col,
                               "cannot find string difference of non-string"
                               " types")
-            result = right.diff(left)
-            frame.push(result)
+            right.diff(left)
+            frame.push(right)
         elif c == bytecode.SUB:
             right = frame.pop()
             left = frame.pop()
@@ -448,6 +448,26 @@ def run(frame, bc):
         elif c == bytecode.J_IF_FALSE:
             if frame.pop().str() == "false":
                 pc = arg
+        elif c == bytecode.SET_INDEX:
+            expr = frame.pop()
+            newval = frame.pop()
+            var = frame.pop()
+            """
+            var.setval(expr, newval)
+            """
+            frame.push(var)
+        elif c == bytecode.GET_INDEX:
+            expr = frame.pop()
+            var = frame.pop()
+            try:
+                result = var.getval(expr)
+                frame.push(result)
+            except IndexError:
+                sodaError(package, line, col,
+                          "string index out of range")
+            except Exception:
+                sodaError(package, line, col,
+                          "indexing operation failed")
         elif c == bytecode.JUMP:
             if arg == -3:
                 sodaError(package, line, col,

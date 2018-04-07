@@ -303,8 +303,12 @@ def expression_paren(s):
     return s[1]
 
 
-@pg.production("expression : IDENTIFIER")
-def expression_iden(s):
+@pg.production("expression : variable")
+def expression_variable(s):
+    return s[0]
+
+@pg.production("variable : IDENTIFIER")
+def variable_iden(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
@@ -312,8 +316,8 @@ def expression_iden(s):
     return ast.Variable(s[0], None, package, line, col)
 
 
-@pg.production("expression : IDENTIFIER . IDENTIFIER")
-def expression_qualifiediden(s):
+@pg.production("variable : IDENTIFIER . IDENTIFIER")
+def variable_qualifiediden(s):
     sourcepos = s[2].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
@@ -357,8 +361,13 @@ def expression_qualifiedcall_noargs(s):
     return ast.Call(s[2], s[0], [], package, line, col)
 
 
-@pg.production("expression : NUMBER")
+@pg.production("expression : number")
 def expression_number(s):
+    return s[0]
+
+
+@pg.production("number : NUMBER")
+def number_number(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
     line = str(sourcepos.lineno)
@@ -384,6 +393,15 @@ def expression_stringliteral(s):
     return ast.String(s[0], package, line, col)
 
 
+@pg.production("expression : variable [ expression ]")
+def expression_index(s):
+    sourcepos = s[1].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.GetIndex(s[0], s[2], package, line, col)
+
+
 @pg.production("expression : [ ]")
 def expression_emptyarray(s):
     sourcepos = s[0].getsourcepos()
@@ -402,6 +420,7 @@ def expression_array(s):
     return ast.Array(s[1].reverse(), package, line, col)
 
 
+@pg.production("expression : [ expressionlist END ]")
 @pg.production("expression : [ expressionlist ]")
 def expression_normalizedarray(s):
     sourcepos = s[0].getsourcepos()
