@@ -204,7 +204,7 @@ class SodaArray(SodaObject):
         self.values = {}
         i = 0
         while i < len(itemlist):
-            self.values[itemlist[i]] = itemlist[i + 1]
+            self.values[itemlist[i].str()] = itemlist[i + 1].str()
             i += 2
 
     def isstr(self):
@@ -223,8 +223,8 @@ class SodaArray(SodaObject):
         s = []
         for key in self.values:
             val = self.values[key]
-            s.append("\"" + key.str() + "\" : "
-                     "\"" + val.str() + "\"")
+            s.append("\"" + key + "\" : "
+                     "\"" + val + "\"")
         return unicode("[" + ", ".join(s) +
                        "]").encode("utf-8")
 
