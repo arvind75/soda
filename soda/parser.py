@@ -393,7 +393,7 @@ def expression_stringliteral(s):
     return ast.String(s[0], package, line, col)
 
 
-@pg.production("expression : variable [ expression ]")
+@pg.production("expression : expression [ expression ]")
 def expression_index(s):
     sourcepos = s[1].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
