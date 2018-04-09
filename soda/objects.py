@@ -208,6 +208,12 @@ class SodaInt(SodaObject):
     def integer(self):
         return self.value.toint()
 
+    def getval(self, idx):
+        raise Exception
+
+    def setval(self, idx, value):
+        raise Exception
+
     def tostr(self):
         return SodaString(self.str().decode("utf-8"))
 
