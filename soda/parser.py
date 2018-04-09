@@ -263,6 +263,15 @@ def identifier(s):
     return ast.RegisterVariable(s[0], package, line, col)
 
 
+@pg.production("identifier : expression [ expression ]")
+def identifier_index(s):
+    sourcepos = s[1].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.SetIndex(s[0], s[2], package, line, col)
+
+
 @pg.production("expression : expression  +  expression")
 @pg.production("expression : expression  ++  expression")
 @pg.production("expression : expression  --  expression")
@@ -306,6 +315,7 @@ def expression_paren(s):
 @pg.production("expression : variable")
 def expression_variable(s):
     return s[0]
+
 
 @pg.production("variable : IDENTIFIER")
 def variable_iden(s):

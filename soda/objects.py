@@ -31,10 +31,8 @@ class SodaString(SodaObject):
         val = self.value[idx.toint().integer()]
         return SodaString(val)
 
-    """
     def setval(self, idx, value):
-        self.value[idx.integer()] = unicode(value.str())
-    """
+        raise Exception
 
     def eq(self, other):
         assert isinstance(other, SodaString)
@@ -236,10 +234,8 @@ class SodaArray(SodaObject):
         except KeyError:
             return SodaString(u"")
 
-    """
     def setval(self, idx, value):
         self.value[idx.str()] = value
-    """
 
     def isstr(self):
         return False

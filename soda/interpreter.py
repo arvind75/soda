@@ -450,12 +450,9 @@ def run(frame, bc):
                 pc = arg
         elif c == bytecode.SET_INDEX:
             expr = frame.pop()
-            newval = frame.pop()
             var = frame.pop()
-            """
+            newval = frame.pop()
             var.setval(expr, newval)
-            """
-            frame.push(var)
         elif c == bytecode.GET_INDEX:
             expr = frame.pop()
             var = frame.pop()
