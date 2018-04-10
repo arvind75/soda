@@ -1,6 +1,7 @@
 from rpython.rlib.runicode import str_decode_utf_8
 from rply.token import BaseBox
 from soda import bytecode
+from soda.errors import sodaError
 from soda.objects import SodaInt, SodaString, SodaFunction, SodaDummy
 
 
@@ -304,6 +305,13 @@ class Function(Node):
                                self.compiler.register_constant(sd),
                                self.package, self.line, self.col)
         for param in self.params:
+            assert isinstance(param, RegisterVariable)
+            if param.value == unicode("vargs"):
+                if self.params.index(param) != len(self.params) - 1:
+                    sodaError(self.package, self.line, self.col,
+                              "vargs must be final parameter in "
+                              "function declaration")
+                function.isvariadic = True
             param.compile(self.compiler)
         for statement in self.body:
             statement.compile(self.compiler)
@@ -332,8 +340,13 @@ class Call(Node):
         idx = compiler.functions.get(self.name + self.reference, -1)
         if not idx == -1:
             function = compiler.constants[idx]
-            if not len(self.exprlist) == function.arity:
-                idx = -2
+            if not function.isvariadic:
+                if not len(self.exprlist) == function.arity:
+                    idx = -2
+            else:
+                if not len(self.exprlist) >= function.arity - 1:
+                    idx = -2
+                function.numargs = len(self.exprlist)
         compiler.emit(bytecode.CALL, idx,
                       self.package, self.line, self.col)
 

@@ -436,7 +436,7 @@ def run(frame, bc):
                 frame.push(interpret(fbc))
             else:
                 arglist = []
-                for i in range(0, function.arity):
+                for i in range(0, function.numargs):
                     value = frame.pop()
                     arglist.append(value)
                 function.evaluate_args(arglist)
