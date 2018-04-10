@@ -16,6 +16,8 @@ class SodaString(SodaObject):
     def __init__(self, value):
         assert isinstance(value, unicode)
         self.value = value
+        a = rbigint()
+        self.length = SodaInt(a.fromint(len(self.value)))
 
     def concat(self, other):
         assert isinstance(other, SodaString)
@@ -121,6 +123,7 @@ class SodaInt(SodaObject):
     def __init__(self, value):
         assert isinstance(value, rbigint)
         self.value = value
+        self.length = None
 
     def add(self, other):
         assert isinstance(other, SodaInt)
@@ -227,6 +230,8 @@ class SodaArray(SodaObject):
         while i < len(itemlist):
             self.value[itemlist[i].str()] = itemlist[i + 1]
             i += 2
+        a = rbigint()
+        self.length = SodaInt(a.fromint(len(self.value)))
 
     def getval(self, idx):
         try:
@@ -236,6 +241,8 @@ class SodaArray(SodaObject):
 
     def setval(self, idx, value):
         self.value[idx.str()] = value
+        a = rbigint()
+        self.length = SodaInt(a.fromint(len(self.value)))
 
     def isstr(self):
         return False
@@ -266,6 +273,7 @@ class SodaFunction(SodaObject):
     def __init__(self, name, arity, compiler, package, line, col):
         self.name = name
         self.arity = arity
+        self.numargs = arity
         self.compiler = compiler
         self.constbuffer = []
         self.package = package

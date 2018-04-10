@@ -45,6 +45,7 @@ pg = ParserGenerator(
         "ENDLOOP",
         "BREAK",
         "WHERE",
+        "LEN",
         "IDENTIFIER"
     ],
     precedence=[
@@ -374,6 +375,15 @@ def expression_qualifiedcall_noargs(s):
 @pg.production("expression : number")
 def expression_number(s):
     return s[0]
+
+
+@pg.production("expression : LEN ( expression )")
+def expression_len(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Len(s[2], package, line, col)
 
 
 @pg.production("number : NUMBER")

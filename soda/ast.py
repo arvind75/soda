@@ -349,3 +349,16 @@ class ReturnStatement(Node):
         self.value.compile(compiler)
         compiler.emit(bytecode.RETURN, 0,
                       self.package, self.line, self.col)
+
+
+class Len(Node):
+    def __init__(self, value, package, line, col):
+        self.value = value
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        self.value.compile(compiler)
+        compiler.emit(bytecode.LEN, 0,
+                      self.package, self.line, self.col)

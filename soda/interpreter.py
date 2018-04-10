@@ -428,6 +428,12 @@ def run(frame, bc):
                 os.write(1, output)
                 fbc = function.compiler.create_bytecode()
                 frame.push(interpret(fbc))
+            if unicode(function.name) == u"Error" and unicode(
+                    function.package) == u"io":
+                output = frame.pop().str()
+                os.write(2, output)
+                fbc = function.compiler.create_bytecode()
+                frame.push(interpret(fbc))
             else:
                 arglist = []
                 for i in range(0, function.arity):
@@ -452,7 +458,11 @@ def run(frame, bc):
             expr = frame.pop()
             var = frame.pop()
             newval = frame.pop()
-            var.setval(expr, newval)
+            try:
+                var.setval(expr, newval)
+            except Exception:
+                sodaError(package, line, col,
+                          "cannot mutate non-array types")
         elif c == bytecode.GET_INDEX:
             expr = frame.pop()
             var = frame.pop()
@@ -464,7 +474,7 @@ def run(frame, bc):
                           "string index out of range")
             except Exception:
                 sodaError(package, line, col,
-                          "indexing operation failed")
+                          "cannot index integers")
         elif c == bytecode.JUMP:
             if arg == -3:
                 sodaError(package, line, col,
@@ -474,6 +484,13 @@ def run(frame, bc):
             if pc < oldpc:
                 driver.can_enter_jit(pc=pc, code=code, positions=positions,
                                      bc=bc, frame=frame)
+        elif c == bytecode.LEN:
+            length = frame.pop().length
+            if length is not None:
+                frame.push(length)
+            else:
+                sodaError(package, line, col,
+                          "cannot find length of integer")
         else:
             sodaError("test", "-1", "-1", "unrecognized bytecode %s" % c)
 

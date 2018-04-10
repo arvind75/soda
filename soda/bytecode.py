@@ -1,4 +1,5 @@
 from soda.errors import sodaError
+
 DROP_CONST = 0
 LOAD_CONST = 1
 LOAD_VAR = 2
@@ -29,6 +30,7 @@ J_IF_TRUE = 26
 J_IF_FALSE = 27
 GET_INDEX = 28
 SET_INDEX = 29
+LEN = 30
 
 BINOP_CODE = {
     "+": ADD,
@@ -86,7 +88,8 @@ NAMES = {
     J_IF_TRUE: " J_IF_TRUE",
     J_IF_FALSE: "J_IF_FALSE",
     GET_INDEX: " GET_INDEX",
-    SET_INDEX: " SET_INDEX"
+    SET_INDEX: " SET_INDEX",
+    LEN: "       LEN"
 }
 
 
