@@ -55,7 +55,7 @@ pg = ParserGenerator(
         ("left", ["+", "-", "++", "--"]),
         ("left", ["*", "/", "%"]),
         ("left", ["^"]),
-        ("left", ["NEG", "!"])
+        ("left", ["NEG", "!", "["])
     ],
     cache_id="soda",
 )
