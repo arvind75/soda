@@ -27,7 +27,7 @@ class SodaString(SodaObject):
         assert isinstance(other, SodaString)
         return SodaString(replace(self.value, other.value, u""))
 
-    def getkey(self):
+    def getkey(self, keypos):
         raise Exception
 
     def getval(self, idx):
@@ -212,7 +212,7 @@ class SodaInt(SodaObject):
     def integer(self):
         return self.value.toint()
 
-    def getkey(self):
+    def getkey(self, keypos):
         raise Exception
 
     def getval(self, idx):

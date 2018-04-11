@@ -4,7 +4,8 @@ from soda.errors import sodaError
 from rpython.rlib import jit
 import os
 
-driver = jit.JitDriver(greens=["pc", "code", "positions", "bc"],
+driver = jit.JitDriver(greens=["pc", "iteridx", "code",
+                               "positions", "bc"],
                        reds=["frame"],
                        is_recursive=True)
 
@@ -28,8 +29,8 @@ def run(frame, bc):
     pc = 0
     iteridx = 0
     while pc < len(bc.code):
-        driver.jit_merge_point(pc=pc, code=code, positions=positions,
-                               bc=bc, frame=frame)
+        driver.jit_merge_point(pc=pc, iteridx=iteridx, code=code,
+                               positions=positions, bc=bc, frame=frame)
         c = code[pc]
         arg = code[pc + 1]
         package, line, col = positions[pc]
@@ -498,8 +499,8 @@ def run(frame, bc):
             oldpc = pc
             pc = arg
             if pc < oldpc:
-                driver.can_enter_jit(pc=pc, code=code, positions=positions,
-                                     bc=bc, frame=frame)
+                driver.can_enter_jit(pc=pc, iteridx=iteridx, code=code,
+                                     positions=positions, bc=bc, frame=frame)
         elif c == bytecode.LEN:
             length = frame.pop().length
             if length is not None:
