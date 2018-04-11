@@ -346,7 +346,6 @@ class Call(Node):
             else:
                 if not len(self.exprlist) >= function.arity - 1:
                     idx = -2
-                function.numargs = len(self.exprlist)
         compiler.emit(bytecode.CALL, idx,
                       self.package, self.line, self.col)
 

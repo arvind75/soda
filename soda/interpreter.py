@@ -436,6 +436,8 @@ def run(frame, bc):
                 frame.push(interpret(fbc))
             else:
                 arglist = []
+                if function.isvariadic:
+                    function.numargs = len(frame.valuestack)
                 for i in range(0, function.numargs):
                     value = frame.pop()
                     arglist.append(value)

@@ -286,12 +286,15 @@ class SodaFunction(SodaObject):
         if self.isvariadic:
             a = rbigint()
             enumlist = []
+            nargstack = []
             j = 0
             for i in range(self.arity - 1, len(argstack)):
                 enumlist.append(SodaInt(a.fromint(j)))
                 enumlist.append(argstack[i])
                 j += 1
-            argstack = argstack[:self.arity - 1]
+            for k in range(0, self.arity - 1):
+                nargstack.append(argstack[k])
+            argstack = nargstack
             argstack.append(SodaArray(enumlist))
         for i in range(0, len(self.compiler.constants)):
             self.constbuffer.append(self.compiler.constants[i])
