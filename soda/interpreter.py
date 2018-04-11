@@ -26,6 +26,7 @@ def run(frame, bc):
     code = bc.code
     positions = bc.positions
     pc = 0
+    iteridx = 0
     while pc < len(bc.code):
         driver.jit_merge_point(pc=pc, code=code, positions=positions,
                                bc=bc, frame=frame)
@@ -456,6 +457,19 @@ def run(frame, bc):
         elif c == bytecode.J_IF_FALSE:
             if frame.pop().str() == "false":
                 pc = arg
+        elif c == bytecode.ITERATE:
+            array = frame.pop()
+            try:
+                keyval = array.getkey(iteridx)
+                if keyval is None:
+                    pc = arg
+                    iteridx = 0
+                else:
+                    frame.push(keyval)
+                    iteridx += 1
+            except Exception:
+                sodaError(package, line, col,
+                          "cannot iterate non-array types")
         elif c == bytecode.SET_INDEX:
             expr = frame.pop()
             var = frame.pop()

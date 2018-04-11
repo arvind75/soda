@@ -7,7 +7,8 @@ numeric = "0123456789"
 insertend = ["number", "string", "identifier",
              ")", "]", "break", "end"]
 reserved = ["fetch", "func", "where", "if",
-            "then", "else", "for", "break", "end", "len"]
+            "then", "else", "for", "break", "end",
+            "in", "len"]
 
 
 class Lexer(BaseBox):
@@ -911,6 +912,13 @@ class Lexer(BaseBox):
                     elif iden == "len":
                         self.lasttoken = "len"
                         yield Token(name="LEN", value=iden,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                    elif iden == "in":
+                        self.lasttoken = "in"
+                        yield Token(name="IN", value=iden,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,

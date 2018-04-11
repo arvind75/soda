@@ -27,6 +27,9 @@ class SodaString(SodaObject):
         assert isinstance(other, SodaString)
         return SodaString(replace(self.value, other.value, u""))
 
+    def getkey(self):
+        raise Exception
+
     def getval(self, idx):
         if idx.toint().integer() > len(self.value) - 1:
             raise IndexError
@@ -209,6 +212,9 @@ class SodaInt(SodaObject):
     def integer(self):
         return self.value.toint()
 
+    def getkey(self):
+        raise Exception
+
     def getval(self, idx):
         raise Exception
 
@@ -226,12 +232,21 @@ class SodaInt(SodaObject):
 class SodaArray(SodaObject):
     def __init__(self, itemlist):
         self.value = {}
+        self.keys = []
         i = 0
         while i < len(itemlist):
             self.value[itemlist[i].str()] = itemlist[i + 1]
+            self.keys.append(itemlist[i])
             i += 2
         a = rbigint()
         self.length = SodaInt(a.fromint(len(self.value)))
+
+    def getkey(self, keypos):
+        if keypos < len(self.keys):
+            key = self.keys[keypos]
+        else:
+            key = None
+        return key
 
     def getval(self, idx):
         try:
@@ -241,6 +256,7 @@ class SodaArray(SodaObject):
 
     def setval(self, idx, value):
         self.value[idx.str()] = value
+        self.keys.append(idx)
         a = rbigint()
         self.length = SodaInt(a.fromint(len(self.value)))
 

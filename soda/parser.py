@@ -46,6 +46,7 @@ pg = ParserGenerator(
         "BREAK",
         "WHERE",
         "LEN",
+        "IN",
         "IDENTIFIER"
     ],
     precedence=[
@@ -124,6 +125,16 @@ def statement_while(s):
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.While(s[1], s[3].get(), package, line, col)
+
+
+@pg.production("statement : FOR IDENTIFIER IN expression END "
+               "statementlist ENDLOOP END")
+def statement_iterate(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Iterate(s[1], s[3], s[5].get(), package, line, col)
 
 
 @pg.production("smlstatement : expression")

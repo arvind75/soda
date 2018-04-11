@@ -153,6 +153,36 @@ class While(Node):
                 compiler.stack[i] = len(compiler.stack)
 
 
+class Iterate(Node):
+    def __init__(self, value, expr, body, package, line, col):
+        string = value.getstr()
+        iden, trash = str_decode_utf_8(string, len(string), "strict", True)
+        self.value = iden
+        self.expr = expr
+        self.body = body
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        initpos = len(compiler.stack)
+        self.expr.compile(compiler)
+        compiler.emit(bytecode.ITERATE, 0, self.package,
+                      self.line, self.col)
+        postpos = len(compiler.stack) - 1
+        compiler.emit(bytecode.STORE_VAR,
+                      compiler.register_variable(self.value, self.package),
+                      self.package, self.line, self.col)
+        for statement in self.body:
+            statement.compile(compiler)
+        compiler.emit(bytecode.JUMP, initpos, self.package,
+                      self.line, self.col)
+        compiler.stack[postpos] = len(compiler.stack)
+        for i in range(initpos, len(compiler.stack)):
+            if compiler.stack[i] == -3:
+                compiler.stack[i] = len(compiler.stack)
+
+
 class Break(Node):
     def __init__(self, package, line, col):
         self.package = package

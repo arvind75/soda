@@ -28,9 +28,10 @@ CALL = 24
 JUMP = 25
 J_IF_TRUE = 26
 J_IF_FALSE = 27
-GET_INDEX = 28
-SET_INDEX = 29
-LEN = 30
+ITERATE = 28
+GET_INDEX = 29
+SET_INDEX = 30
+LEN = 31
 
 BINOP_CODE = {
     "+": ADD,
@@ -87,6 +88,7 @@ NAMES = {
     JUMP: "      JUMP",
     J_IF_TRUE: " J_IF_TRUE",
     J_IF_FALSE: "J_IF_FALSE",
+    ITERATE: "   ITERATE",
     GET_INDEX: " GET_INDEX",
     SET_INDEX: " SET_INDEX",
     LEN: "       LEN"
