@@ -1,5 +1,5 @@
 from rply.token import BaseBox
-from rpython.rlib.rstring import replace
+from rpython.rlib.rstring import replace, UnicodeBuilder
 from rpython.rlib.rbigint import rbigint
 
 
@@ -12,6 +12,35 @@ class SodaDummy(SodaObject):
         pass
 
 
+class SodaBuilder(SodaObject):
+    def __init__(self, value):
+        self.value = value
+
+    def concat(self, other):
+        self.value.append(unicode(other.str()))
+        return SodaBuilder(self.value)
+
+    def isstr(self):
+        return True
+
+    def isint(self):
+        return False
+
+    def isarray(self):
+        return False
+
+    def toint(self):
+        a = rbigint()
+        number = a.fromstr(str(self.value.build()))
+        return SodaInt(number)
+
+    def tostr(self):
+        return SodaString(self.value.build())
+
+    def str(self):
+        return self.value.build().encode("utf-8")
+
+
 class SodaString(SodaObject):
     def __init__(self, value):
         assert isinstance(value, unicode)
@@ -20,8 +49,10 @@ class SodaString(SodaObject):
         self.length = SodaInt(a.fromint(len(self.value)))
 
     def concat(self, other):
-        assert isinstance(other, SodaString)
-        return SodaString(self.value + other.value)
+        builder = UnicodeBuilder()
+        builder.append(self.value)
+        builder.append(unicode(other.str()))
+        return SodaBuilder(builder)
 
     def diff(self, other):
         assert isinstance(other, SodaString)
