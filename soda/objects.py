@@ -20,6 +20,49 @@ class SodaBuilder(SodaObject):
         self.value.append(unicode(other.str()))
         return SodaBuilder(self.value)
 
+    def diff(self, other):
+        return (self.tostr().diff(other.tostr()))
+
+    def getkey(self, keypos):
+        raise Exception
+
+    def setval(self, idx, value):
+        raise Exception
+
+    def getval(self, idx):
+        string = self.value.build()
+        if idx.toint().integer() > len(string) - 1:
+            raise IndexError
+        val = string[idx.toint().integer()]
+        return SodaString(val)
+
+    def eq(self, other):
+        return (self.tostr().eq(other.tostr()))
+
+    def ne(self, other):
+        return (self.tostr().ne(other.tostr()))
+
+    def gt(self, other):
+        return (self.tostr().gt(other.tostr()))
+
+    def lt(self, other):
+        return (self.tostr().lt(other.tostr()))
+
+    def ge(self, other):
+        return (self.tostr().ge(other.tostr()))
+
+    def le(self, other):
+        return (self.tostr().le(other.tostr()))
+
+    def land(self, other):
+        return (self.tostr().land(other.tostr()))
+
+    def lor(self, other):
+        return (self.tostr().lor(other.tostr()))
+
+    def lnot(self):
+        return (self.tostr().lnot())
+
     def isstr(self):
         return True
 
