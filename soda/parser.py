@@ -37,7 +37,7 @@ pg = ParserGenerator(
         "END",
         "NUMBER",
         "STRING",
-        "FUNC",
+        "FN",
         "IF",
         "THEN",
         "ELSE",
@@ -171,7 +171,7 @@ def returnstatement(s):
     return ast.ReturnStatement(s[0], "", "", "")
 
 
-@pg.production("function : FUNC IDENTIFIER ( ) = returnstatement WHERE "
+@pg.production("function : FN IDENTIFIER ( ) = returnstatement WHERE "
                "statementlist ENDLOOP")
 def function_noarg(s):
     sourcepos = s[0].getsourcepos()
@@ -182,7 +182,7 @@ def function_noarg(s):
                         s[5], package, line, col)
 
 
-@pg.production("function : FUNC IDENTIFIER ( ) = returnstatement")
+@pg.production("function : FN IDENTIFIER ( ) = returnstatement")
 def function_nostatement_noarg(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
@@ -192,7 +192,7 @@ def function_nostatement_noarg(s):
                         s[5], package, line, col)
 
 
-@pg.production("function : FUNC IDENTIFIER ( paramlist ) = returnstatement")
+@pg.production("function : FN IDENTIFIER ( paramlist ) = returnstatement")
 def function_nostatement_arg(s):
     sourcepos = s[0].getsourcepos()
     package = fetcher.packages[sourcepos.idx]
@@ -202,7 +202,7 @@ def function_nostatement_arg(s):
                         s[6], package, line, col)
 
 
-@pg.production("function : FUNC IDENTIFIER ( paramlist ) = returnstatement "
+@pg.production("function : FN IDENTIFIER ( paramlist ) = returnstatement "
                "WHERE statementlist ENDLOOP")
 def function_arg(s):
     sourcepos = s[0].getsourcepos()
