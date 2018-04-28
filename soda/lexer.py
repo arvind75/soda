@@ -5,10 +5,11 @@ newlines = "\n\r\v"
 symbols = ":.,;!=<>&|()[]+-*/%^\"#"
 numeric = "0123456789"
 insertend = ["number", "string", "identifier",
-             ")", "]", "break", "end"]
+             ")", "]", "break", "end", "chars",
+             "words", "lines"]
 reserved = ["fetch", "fn", "where", "if",
             "then", "else", "for", "break", "end",
-            "in", "len"]
+            "in", "len", "chars", "words", "lines"]
 
 
 class Lexer(BaseBox):
@@ -919,6 +920,27 @@ class Lexer(BaseBox):
                     elif iden == "in":
                         self.lasttoken = "in"
                         yield Token(name="IN", value=iden,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                    elif iden == "words":
+                        self.lasttoken = "words"
+                        yield Token(name="WORDS", value=iden,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                    elif iden == "chars":
+                        self.lasttoken = "chars"
+                        yield Token(name="CHARS", value=iden,
+                                    source_pos=SourcePosition(
+                                        idx=self.idx,
+                                        lineno=self.lineno,
+                                        colno=self.colno))
+                    elif iden == "lines":
+                        self.lasttoken = "lines"
+                        yield Token(name="LINES", value=iden,
                                     source_pos=SourcePosition(
                                         idx=self.idx,
                                         lineno=self.lineno,

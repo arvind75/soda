@@ -445,6 +445,7 @@ def run(frame, bc):
                     arglist.append(value)
                 function.evaluate_args(arglist)
                 fbc = function.compiler.create_bytecode()
+                fbc.textarrays = bc.textarrays
                 try:
                     function.revert_state()
                     result = interpret(fbc)
@@ -508,6 +509,12 @@ def run(frame, bc):
             else:
                 sodaError(package, line, col,
                           "cannot find length of integer")
+        elif c == bytecode.CHARS:
+            frame.push(bc.textarrays[0])
+        elif c == bytecode.WORDS:
+            frame.push(bc.textarrays[1])
+        elif c == bytecode.LINES:
+            frame.push(bc.textarrays[2])
         else:
             sodaError("test", "-1", "-1", "unrecognized bytecode %s" % c)
 

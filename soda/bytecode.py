@@ -1,4 +1,7 @@
 from soda.errors import sodaError
+from rpython.rlib.rbigint import rbigint
+from rpython.rlib.runicode import str_decode_utf_8
+from soda.objects import SodaArray, SodaString, SodaInt
 
 DROP_CONST = 0
 LOAD_CONST = 1
@@ -32,6 +35,9 @@ ITERATE = 28
 GET_INDEX = 29
 SET_INDEX = 30
 LEN = 31
+CHARS = 32
+WORDS = 33
+LINES = 34
 
 BINOP_CODE = {
     "+": ADD,
@@ -91,7 +97,10 @@ NAMES = {
     ITERATE: "   ITERATE",
     GET_INDEX: " GET_INDEX",
     SET_INDEX: " SET_INDEX",
-    LEN: "       LEN"
+    LEN: "       LEN",
+    CHARS: "     CHARS",
+    WORDS: "     WORDS",
+    LINES: "     LINES"
 }
 
 
@@ -143,6 +152,7 @@ class Bytecode(object):
         self.positions = positions
         self.constants = constants
         self.numvars = numvars
+        self.textarrays = []
 
     def dump(self):
         formatted = []
@@ -151,6 +161,57 @@ class Bytecode(object):
             argument = str(self.code[i + 1])
             formatted.append("%s %s\n" % (opcode, argument))
         return "".join(formatted)
+
+    def create_arrays(self, text):
+        self.textarrays = []
+        chars, words, lines = [], [], []
+        wordbuffer, linebuffer = [], []
+        i, j, k = 0, 0, 0
+        a = rbigint()
+        text, trash = str_decode_utf_8(text, len(text), "strict", True)
+        for char in text:
+            if char == " " and wordbuffer != []:
+                word = u"".join(wordbuffer)
+                words.append(SodaInt(a.fromint(j)))
+                words.append(SodaString(word))
+                wordbuffer = []
+                j += 1
+                chars.append(SodaInt(a.fromint(i)))
+                chars.append(SodaString(char))
+                linebuffer.append(char)
+                i += 1
+            elif char == "\n" and linebuffer != []:
+                line = u"".join(linebuffer)
+                lines.append(SodaInt(a.fromint(k)))
+                lines.append(SodaString(line))
+                linebuffer = []
+                k += 1
+                if not wordbuffer == []:
+                    word = u"".join(wordbuffer)
+                    words.append(SodaInt(a.fromint(j)))
+                    words.append(SodaString(word))
+                    wordbuffer = []
+                    j += 1
+                chars.append(SodaInt(a.fromint(i)))
+                chars.append(SodaString(char))
+                i += 1
+            else:
+                chars.append(SodaInt(a.fromint(i)))
+                chars.append(SodaString(char))
+                wordbuffer.append(char)
+                linebuffer.append(char)
+                i += 1
+        if not wordbuffer == []:
+            word = u"".join(wordbuffer)
+            words.append(SodaInt(a.fromint(j)))
+            words.append(SodaString(word))
+        if not linebuffer == []:
+            line = u"".join(linebuffer)
+            lines.append(SodaInt(a.fromint(k)))
+            lines.append(SodaString(line))
+        self.textarrays.append(SodaArray(chars))
+        self.textarrays.append(SodaArray(words))
+        self.textarrays.append(SodaArray(lines))
 
 
 def compile_ast(ast_node):

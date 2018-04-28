@@ -245,6 +245,39 @@ class GetIndex(Node):
                       self.package, self.line, self.col)
 
 
+class Chars(Node):
+    def __init__(self, package, line, col):
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        compiler.emit(bytecode.CHARS, 0,
+                      self.package, self.line, self.col)
+
+
+class Words(Node):
+    def __init__(self, package, line, col):
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        compiler.emit(bytecode.WORDS, 0,
+                      self.package, self.line, self.col)
+
+
+class Lines(Node):
+    def __init__(self, package, line, col):
+        self.package = package
+        self.line = line
+        self.col = col
+
+    def compile(self, compiler):
+        compiler.emit(bytecode.LINES, 0,
+                      self.package, self.line, self.col)
+
+
 class RegisterVariable(Node):
     def __init__(self, value, package, line, col):
         string = value.getstr()

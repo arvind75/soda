@@ -47,6 +47,9 @@ pg = ParserGenerator(
         "WHERE",
         "LEN",
         "IN",
+        "CHARS",
+        "WORDS",
+        "LINES",
         "IDENTIFIER"
     ],
     precedence=[
@@ -422,6 +425,33 @@ def expression_stringliteral(s):
     line = str(sourcepos.lineno)
     col = str(sourcepos.colno)
     return ast.String(s[0], package, line, col)
+
+
+@pg.production("expression : CHARS")
+def expression_chars(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Chars(package, line, col)
+
+
+@pg.production("expression : WORDS")
+def expression_words(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Words(package, line, col)
+
+
+@pg.production("expression : LINES")
+def expression_lines(s):
+    sourcepos = s[0].getsourcepos()
+    package = fetcher.packages[sourcepos.idx]
+    line = str(sourcepos.lineno)
+    col = str(sourcepos.colno)
+    return ast.Lines(package, line, col)
 
 
 @pg.production("expression : expression [ expression ]")
