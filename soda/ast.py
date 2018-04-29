@@ -1,3 +1,9 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# ast.py defines the abstract syntax tree
+# and the compile methods for each node
+
 from rpython.rlib.runicode import str_decode_utf_8
 from rply.token import BaseBox
 from soda import bytecode

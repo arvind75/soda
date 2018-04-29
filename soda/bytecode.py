@@ -1,3 +1,9 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# bytecode.py defines the bytecode and
+# compiler for soda
+
 from soda.errors import sodaError
 from rpython.rlib.rbigint import rbigint
 from rpython.rlib.runicode import str_decode_utf_8

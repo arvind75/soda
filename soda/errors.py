@@ -1,3 +1,8 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# error.py defines the sodaError() function
+
 import os
 
 WINDOWS = "nt"

@@ -1,3 +1,8 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# lexer.py tokenizes input files
+
 from rply.token import Token, BaseBox, SourcePosition
 
 whitespace = " \n\r\v\t"

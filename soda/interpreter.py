@@ -1,3 +1,9 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# interpreter.py contains the interpreter itself, as well as the
+# program stack
+
 from soda import bytecode
 from soda.objects import SodaArray
 from soda.errors import sodaError

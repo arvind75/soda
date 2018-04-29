@@ -1,3 +1,9 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# fetcher.py does the work of the fetch statement
+# package imports, data parsing, etc.
+
 from rpython.rlib.streamio import open_file_as_stream
 from rpython.rlib.rpath import rnormpath
 from soda.lexer import lexer

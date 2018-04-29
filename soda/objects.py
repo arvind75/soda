@@ -1,3 +1,8 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# objects.py defines the primitive datatypes of soda
+
 from rply.token import BaseBox
 from rpython.rlib.rstring import replace, UnicodeBuilder
 from rpython.rlib.rbigint import rbigint

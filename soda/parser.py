@@ -1,3 +1,9 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# parser.py creates the parser
+# makes use of the rPLY parser generator
+
 from rpython.rlib.rbigint import rbigint
 from rply import ParserGenerator
 from soda.errors import sodaError

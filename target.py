@@ -1,3 +1,9 @@
+# Phillip Wells
+# CSCI-200 Algorithm Analysis
+
+# target.py defines the entry point for translation
+# and parses command-line arguments
+
 from rpython.jit.codewriter.policy import JitPolicy
 from rpython.rlib.streamio import open_file_as_stream
 from soda.interpreter import interpret
