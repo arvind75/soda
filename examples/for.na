@@ -1,0 +1,16 @@
+# for.na
+fetch "io"
+
+a := [1, 2, 3]
+count, j := 0, 0
+
+# Prints 0 to 29
+for i := 0; i < 10; i := i + 1
+  for j < 10
+    for i in a
+        io.Println(count)
+        count := count + 1
+    end
+    j := j + 1
+  end
+end

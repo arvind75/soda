@@ -1,0 +1,6 @@
+# if.na
+fetch "io"
+
+if 1 + 1 == 2
+  then io.Println("true")
+  else io.Println("false")

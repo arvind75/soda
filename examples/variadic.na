@@ -1,0 +1,11 @@
+# variadic.na
+fetch "io"
+
+fn addMany(x, vargs) = sum where
+  sum := x
+  for i in vargs
+    sum := sum + vargs[i]
+  end
+end
+
+io.Println(addMany(1, 2, 3))

@@ -1,0 +1,4 @@
+# hello.na
+fetch "io"
+
+io.Println("hello, world!")

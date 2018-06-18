@@ -1,0 +1,9 @@
+# text.na
+fetch "io"
+
+for i in words
+  io.Print(" ")
+  if words[i] == "Denise"
+    then io.Print("Dr. Byrnes")
+    else io.Print(words[i])
+end

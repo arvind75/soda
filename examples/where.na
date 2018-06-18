@@ -1,0 +1,8 @@
+# where.na
+fetch "io"
+
+fn add(x, y) = sum where
+  sum := x + y
+end
+
+io.Println(add(1, 3))

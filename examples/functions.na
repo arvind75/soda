@@ -1,0 +1,6 @@
+# functions.na
+fetch "io"
+
+fn add(x, y) = x + y
+
+io.Println(add(1, 3))

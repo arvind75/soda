@@ -1,0 +1,22 @@
+# Package arrays defines useful functions for manipulating arrays.
+
+# Reports the first instance of an item in an input array.
+# Returns "false" if no index is found.
+func Index(array, item) = index where
+    index := "false"
+    for idx in array
+        if array[idx] == item
+            then index := idx
+                 break
+            else ""
+    end
+end
+
+# Normalizes the indices of an input array.
+# Returns the normalized array.
+func Normalize(array) = normArray where
+    normArray := []
+    for idx in array
+        normArray[len(normArray)] := array[idx]
+    end
+end

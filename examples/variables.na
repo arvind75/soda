@@ -1,0 +1,11 @@
+# variables.na
+fetch "io"
+
+a := "hello"
+b := "world"
+
+io.Println(a, b) # hello world
+
+a, b := b, a
+
+io.Println(a, b) # world hello
