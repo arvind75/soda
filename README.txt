@@ -6,7 +6,8 @@ College of Wooster
 
 This software was produced in partial fulfillment of the requirements for the Junior Independent Study project.
 
-Requires Python2.7 and RPython (https://rpython.readthedocs.io/en/latest/).
+Requires Python2.7, RPython (https://rpython.readthedocs.io/en/latest/), and RPly (https://media.readthedocs.org/pdf/rply/latest/rply.pdf).
+
 
 Compile with `rpython -Ojit target.py`.
 
